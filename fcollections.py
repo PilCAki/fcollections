@@ -4,9 +4,9 @@ fcollections.py
 
 tossing all the neat stuff from cytoolz and itertools and more in as members of collections classes.
 
-FList member functions always return FList if it makes sense.
+flist member functions always return FList if it makes sense.
 
-FGenerator member functions always return FGnenerator if it makes sense.
+fgenerator member functions always return FGnenerator if it makes sense.
 
 Exceptions are functions which should obviously return other types, like "reduce" - 
     which may return a whole host of types.
@@ -16,9 +16,9 @@ Converting between a list and a generator is done by using .tolist or .togenerat
 .tolist and .togenerator can be used to ensure that something you MEAN to be a list
 or generator stays and is that way.
 
-FList() and FGenerator() can be used to convert any normal iterable to either
+flist() and fgenerator() can be used to convert any normal iterable to either
 
-There's an FDict too.
+There's an fdict too.
 
 '''
 
@@ -46,9 +46,9 @@ class FBase(object):
         return cytoolz.first(self)
     @property
     def frequencies(self):
-        return FDict(cytoolz.frequencies(self))
+        return fdict(cytoolz.frequencies(self))
     def groupby(self, key):
-        return FDict(cytoolz.groupby(key, self)).valmap(FList)
+        return fdict(cytoolz.groupby(key, self)).valmap(flist)
     def interleave(self, seq, swap=False):
         args = (seq, self) if swap else (self, seq)
         return self.__class__(cytoolz.interleave(args))
@@ -76,10 +76,10 @@ class FBase(object):
         self = self.__class__(seq)
         return first
     def pluck(self, ind):
-        if cytoolz.isiterable(ind): return self.__class__(itertools.imap(FList, cytoolz.pluck(ind, self)))
+        if cytoolz.isiterable(ind): return self.__class__(itertools.imap(flist, cytoolz.pluck(ind, self)))
         else: return self.__class__(cytoolz.pluck(ind, self))
     def reduce_by(self, key, op):
-        return FDict(cytoolz.reduceby(key, op, self)) 
+        return fdict(cytoolz.reduceby(key, op, self)) 
     def remove(self, predicate):
         return self.__class__(cytoolz.remove(predicate, self))
     @property
@@ -87,7 +87,7 @@ class FBase(object):
         return cytoolz.second(self)
     def sliding_window(self, n):
         ''' assuming should always be a generator - otherwise - going to get huge '''
-        return FGenerator(self.__class__(sw) for sw in cytoolz.sliding_window(n, self))
+        return fgenerator(self.__class__(sw) for sw in cytoolz.sliding_window(n, self))
     def take(self, n):
         return self.__class__(cytoolz.take(n, self))
     def tail(self, n):
@@ -100,7 +100,7 @@ class FBase(object):
     def unique(self, key=cytoolz.functoolz.identity):
         return self.__class__(cytoolz.unique(self, key))
     def count_by(self, key=cytoolz.functoolz.identity):
-        return FDict(cytoolz.countby(key, self))
+        return fdict(cytoolz.countby(key, self))
     def partition_by(self, f):
         return self.__class__(self.__class__(p) for p in cytoolz.partitionby(f, self))
     def pipe(self, *fs):
@@ -112,69 +112,58 @@ class FBase(object):
 ## MAIN CLASSES
 ## --------------------------------------------------------------------------------
 
-class FList(FBase, list):
+class flist(FBase, list):
     def __getslice__(self, *args):
-        return FList(super(FList, self).__getslice__(*args))
+        return flist(super(FList, self).__getslice__(*args))
     @property
     def to_generator(self):
-        return FGenerator(self)
+        return fgenerator(self)
     @property
     def sorted(self):
         return self.__class__(sorted(self))
     def sort_by(self, key):
         return self.__class__(sorted(self, key=key))
 
-class FGenerator(FBase):
+class fgenerator(FBase):
     def __init__(self, _iterable):
         self._iterable = _iterable
     def __iter__(self):
         return (_ for _ in self._iterable)
     @property
     def to_list(self):
-        return FList(self)
+        return flist(self)
     def get(self, ind, default=None):
         return cytoolz.get(ind, self, default)
     
-class FDict(dict):
+class fdict(dict):
     def keymap(self):
         pass
     @property
     def keys(self):
-        return FList(self.viewkeys())
+        return flist(self.viewkeys())
     @property
     def values(self):
-        return FList(self.viewvalues())
+        return flist(self.viewvalues())
     @property
     def items(self):
-        return FList(self.viewitems())
+        return flist(self.viewitems())
     def keymap(self, f):
-        return FDict(cytoolz.keymap(f, self))
+        return fdict(cytoolz.keymap(f, self))
     def valmap(self, f):
-        return FDict(cytoolz.valmap(f, self))
+        return fdict(cytoolz.valmap(f, self))
     def itemmap(self, f):
-        return FGenerator(cytoolz.itemmap(f, self))
+        return fgenerator(cytoolz.itemmap(f, self))
     def keyfilter(self, predicate):
-        return FDict(cytoolz.keyfilter(predicate, self))
+        return fdict(cytoolz.keyfilter(predicate, self))
     def valfilter(self, predicate):
-        return FDict(cytoolz.valfilter(predicate, self))
+        return fdict(cytoolz.valfilter(predicate, self))
     def itemfilter(self, predicate):
-        return FDict(cytoolz.itemfilter(predicate, self))
+        return fdict(cytoolz.itemfilter(predicate, self))
     def merge(self, *dicts, **kwargs):
-        return FDict(cytoolz.merge(*((self,)+dicts), **kwargs))
-
-## --------------------------------------------------------------------------------
-## OVERWRITING STD LIB
-## --------------------------------------------------------------------------------
+        return fdict(cytoolz.merge(*((self,)+dicts), **kwargs))
 
 def frange(*args):
-    return FList(old_range(*args))
+    return flist(xrange(*args))
 def fxrange(*args):
-    return FGenerator(old_xrange(*args))
+    return fgenerator(xrange(*args))
 
-# replace std collections
-list = FList
-dict = FDict
-# replace range
-old_range, range = range, frange
-# replace xrange
-old_xrange, xrange = xrange, fxrange
