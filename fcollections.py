@@ -114,7 +114,7 @@ class FBase(object):
 
 class flist(FBase, list):
     def __getslice__(self, *args):
-        return flist(super(FList, self).__getslice__(*args))
+        return flist(super(flist, self).__getslice__(*args))
     @property
     def to_generator(self):
         return fgenerator(self)

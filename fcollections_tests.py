@@ -12,19 +12,11 @@ def is_test(test):
     TESTS.append(test)
     return test
 
-
-
-@is_test
-def replacing_std_lib_collection():
-    assert type(list) == type(FList)
-    assert type(dict) == type(FDict)
-    print 'passed replacing std lib collection test'
-
 @is_test
 def random_tests():
-    a = range(10)
-    b = range(4,13) 
-    c = list(range(_) for _ in range(5,10))
+    a = frange(10)
+    b = frange(4,13) 
+    c = flist(frange(_) for _ in frange(5,10))
     print 'c', c 
     is_even = lambda i: 'is_even' if i%2==0 else 'is_odd'
     print a.map(lambda x:x/2)
@@ -59,10 +51,10 @@ def random_tests():
 @is_test
 def parens_pipe_test():
     print 'parens pipe test'
-    a = range(100)
+    a = frange(100)
     print (a.partition(10)  # partition first
-      .map(lambda l:FList(l*3)) # then do some other shit
-      .reduce(lambda a,b:FList(a+b)) # that's right - comment all you want
+      .map(lambda l:flist(l*3)) # then do some other shit
+      .reduce(lambda a,b:flist(a+b)) # that's right - comment all you want
       .reduce(lambda a,b:a+b)) # now that's a very good boy
 
 if __name__ == "__main__":
