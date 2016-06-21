@@ -40,6 +40,8 @@ class FBase(object):
         return self.__class__(cytoolz.diff(*((self,)+seqs), **kwargs))
     def drop(self, n):
         return self.__class__(cytoolz.drop(n, self))
+    def filter(self, predicate):
+        return self.__class__(itertools.ifilter(predicate, self))
     def first(self):
         return cytoolz.first(self)
     def frequencies(self):
