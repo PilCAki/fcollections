@@ -53,9 +53,9 @@ def parens_pipe_test():
     print 'parens pipe test'
     a = frange(100)
     print (a.partition(10)  # partition first
-      .map(lambda l:flist(l*3)) # then do some other shit
+      .map(lambda l:flist(l*3)) # then do some other stuff
       .reduce(lambda a,b:flist(a+b)) # that's right - comment all you want
-      .reduce(lambda a,b:a+b)) # now that's a very good boy
+      .reduce(lambda a,b:a+b)) # now there you go
 
 if __name__ == "__main__":
     for test in TESTS: test()
