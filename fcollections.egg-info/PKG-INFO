@@ -7,4 +7,5 @@ Download-URL: https://github.com/PilCAki/fcollections/tarball/0.1
 Author: Phillip Adkins
 Author-email: philchiladki@yahoo.com
 Keywords: chaining,functional,cytoolz,itertoolz
+Requires-Python: >=3.6
 License-File: LICENSE
