@@ -101,7 +101,7 @@ class FBase:
         return cytoolz.last(self)
     def mapcat(self, f: Callable[[T], Iterable[S]]) -> 'FBase':
         """Map a function over elements and concatenate results."""
-        return self.__class__(self.__class__(_.map(f) for _ in self)).concat
+        return self.__class__(self.__class__(_.map(f) for _ in self)).concat()
     
     def nth(self, n: int) -> T:
         """Return the nth element."""
