@@ -1,0 +1,9 @@
+LICENSE
+setup.py
+fcollections/__init__.py
+fcollections/fcollections.py
+fcollections.egg-info/PKG-INFO
+fcollections.egg-info/SOURCES.txt
+fcollections.egg-info/dependency_links.txt
+fcollections.egg-info/requires.txt
+fcollections.egg-info/top_level.txt
