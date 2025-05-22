@@ -1,6 +1,8 @@
 # fcollections
 
 
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://img.shields.io/pypi/v/fcollections.svg)](https://pypi.org/project/fcollections/)
 ![Tests](https://github.com/PilCAki/fcollections/workflows/Tests/badge.svg)
 [![codecov](https://codecov.io/gh/PilCAki/fcollections/branch/master/graph/badge.svg)](https://codecov.io/gh/PilCAki/fcollections)
 
@@ -13,7 +15,7 @@ fcollections provides collections with functional programming operations and met
 - `flist` - A list that returns `flist` for operations when it makes sense
 - `fgenerator` - A generator that returns `fgenerator` for operations when it makes sense
 - `fdict` - A dictionary with additional functional operations
-=======
+
 A Python library that provides enhanced collection classes with method chaining capabilities. fcollections wraps functionality from cytoolz and itertools as methods of collection classes, enabling a fluent functional programming style.
 
 ## Features
@@ -23,7 +25,6 @@ A Python library that provides enhanced collection classes with method chaining 
 - Type preservation (methods return the same collection type when possible)
 - Seamless integration with cytoolz and itertools functionality
 - Three main collection types: flist, fgenerator, and fdict
-
 
 ## Installation
 
@@ -60,7 +61,8 @@ To run the tests:
 ```bash
 pip install pytest pytest-cov
 pytest --cov=fcollections tests/
-=======
+```
+
 ## Dependencies
 
 - cytoolz
@@ -230,9 +232,8 @@ adjusted = data.pipe_map(lambda x: x - 4, lambda x: x + 4, lambda x: x * 2)
 
 ## License
 
-
 GNU General Public License v3.0
-=======
+
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
