@@ -1,4 +1,5 @@
 LICENSE
+README.md
 setup.py
 fcollections/__init__.py
 fcollections/fcollections.py
@@ -7,3 +8,6 @@ fcollections.egg-info/SOURCES.txt
 fcollections.egg-info/dependency_links.txt
 fcollections.egg-info/requires.txt
 fcollections.egg-info/top_level.txt
+tests/test_fdict.py
+tests/test_fgenerator.py
+tests/test_flist.py

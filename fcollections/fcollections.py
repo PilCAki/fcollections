@@ -64,7 +64,6 @@ class FBase:
         """Filter elements based on a predicate."""
         return self.__class__(filter(predicate, self))
     
-    @property
     def first(self) -> T:
         """Return the first element."""
         return cytoolz.first(self)
@@ -96,7 +95,6 @@ class FBase:
         """Join two sequences based on matching keys."""
         return self.__class__(cytoolz.join(leftkey, self, rightkey, rightseq))
     
-    @property
     def last(self) -> T:
         """Return the last element."""
         return cytoolz.last(self)
@@ -138,7 +136,6 @@ class FBase:
         """Remove elements that satisfy the predicate."""
         return self.__class__(cytoolz.remove(predicate, self))
     
-    @property
     def second(self) -> T:
         """Return the second element."""
         return cytoolz.second(self)
