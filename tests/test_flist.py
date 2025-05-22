@@ -3,7 +3,7 @@ Unit tests for flist functionality
 """
 import pytest
 import numpy as np
-from fcollections import flist, frange
+from fcollections import flist, frange, fset
 
 class TestFList:
     def test_creation(self):
@@ -122,6 +122,70 @@ class TestFList:
         a = flist(["apple", "banana", "pear", "kiwi"])
         sorted_by_len = a.sort_by(len)
         assert list(sorted_by_len) == ["pear", "kiwi", "apple", "banana"]
+    
+    def test_new_methods(self):
+        """Test new chainable methods"""
+        # Find
+        a = frange(10)
+        found = a.find(lambda x: x > 5)
+        assert found == 6
+        
+        # Not found
+        not_found = a.find(lambda x: x > 20)
+        assert not_found is None
+        
+        # Zip with
+        a = frange(5)
+        b = frange(5, 10)
+        zipped = a.zip_with(b, lambda x, y: x + y)
+        assert isinstance(zipped, flist)
+        assert list(zipped) == [5, 7, 9, 11, 13]
+        
+        # Chunk (alias for partition)
+        chunks = a.chunk(2)
+        assert isinstance(chunks, flist)
+        assert [list(c) for c in chunks] == [[0, 1], [2, 3]]
+        
+        # Flatten
+        nested = flist([[1, 2], [3, 4], [5, 6]])
+        flattened = nested.flatten()
+        assert isinstance(flattened, flist)
+        assert list(flattened) == [1, 2, 3, 4, 5, 6]
+        
+        # Any match / all match
+        assert a.any_match(lambda x: x > 3) is True
+        assert a.any_match(lambda x: x < 0) is False
+        assert a.all_match(lambda x: x >= 0) is True
+        assert a.all_match(lambda x: x > 2) is False
+        
+        # Enumerate
+        enumerated = a.enumerate(1)
+        assert isinstance(enumerated, flist)
+        assert list(enumerated) == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
+        
+        # Take while / drop while
+        a = frange(10)
+        taken = a.take_while(lambda x: x < 5)
+        assert isinstance(taken, flist)
+        assert list(taken) == [0, 1, 2, 3, 4]
+        
+        dropped = a.drop_while(lambda x: x < 5)
+        assert isinstance(dropped, flist)
+        assert list(dropped) == [5, 6, 7, 8, 9]
+    
+    def test_conversion_methods(self):
+        """Test new conversion methods"""
+        a = frange(5)
+        
+        # To set
+        s = a.to_set()
+        assert isinstance(s, fset)
+        assert s == {0, 1, 2, 3, 4}
+        
+        # To tuple
+        t = a.to_tuple()
+        assert isinstance(t, tuple)
+        assert t == (0, 1, 2, 3, 4)
         
     # Edge cases tests
     def test_empty_list(self):

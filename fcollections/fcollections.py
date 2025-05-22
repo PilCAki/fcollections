@@ -24,6 +24,7 @@ There's an fdict too.
 
 import cytoolz
 import itertools
+import toolz  # Added for functions not in cytoolz
 from typing import Any, Callable, Dict, Generator, Iterable, List, Optional, Tuple, TypeVar, Union, cast
 from functools import reduce
 
@@ -181,6 +182,58 @@ class FBase:
         """Apply a sequence of functions to each element."""
         return self.__class__(cytoolz.functoolz.pipe(_, *fs) for _ in self)
     
+    def find(self, predicate: Callable[[T], bool]) -> Optional[T]:
+        """Find first element that satisfies predicate, or None if not found."""
+        for item in self:
+            if predicate(item):
+                return item
+        return None
+    
+    def zip_with(self, seq: Iterable, func: Callable[[T, Any], S]) -> 'FBase':
+        """Combine two sequences using a function."""
+        return self.__class__(func(a, b) for a, b in zip(self, seq))
+    
+    def chunk(self, n: int) -> 'FBase':
+        """Alias for partition with more intuitive name."""
+        return self.partition(n)
+    
+    def flatten(self) -> 'FBase':
+        """Flatten one level of nesting."""
+        return self.__class__(item for sublist in self for item in sublist)
+    
+    def any_match(self, predicate: Callable[[T], bool]) -> bool:
+        """Return True if any element satisfies the predicate."""
+        return any(predicate(x) for x in self)
+    
+    def all_match(self, predicate: Callable[[T], bool]) -> bool:
+        """Return True if all elements satisfy the predicate."""
+        return all(predicate(x) for x in self)
+    
+    def enumerate(self, start: int = 0) -> 'FBase':
+        """Return (index, item) pairs."""
+        return self.__class__(enumerate(self, start))
+    
+    def take_while(self, predicate: Callable[[T], bool]) -> 'FBase':
+        """Take elements while predicate is true."""
+        def _take_while():
+            for element in self:
+                if predicate(element):
+                    yield element
+                else:
+                    break
+        return self.__class__(_take_while())
+    
+    def drop_while(self, predicate: Callable[[T], bool]) -> 'FBase':
+        """Drop elements while predicate is true."""
+        def _drop_while():
+            dropping = True
+            for element in self:
+                if dropping and not predicate(element):
+                    dropping = False
+                if not dropping:
+                    yield element
+        return self.__class__(_drop_while())
+    
 ## --------------------------------------------------------------------------------
 ## MAIN CLASSES
 ## --------------------------------------------------------------------------------
@@ -196,6 +249,14 @@ class flist(FBase, list):
     def to_generator(self) -> 'fgenerator':
         """Convert list to generator."""
         return fgenerator(self)
+    
+    def to_set(self) -> 'fset':
+        """Convert list to set."""
+        return fset(self)
+    
+    def to_tuple(self) -> tuple:
+        """Convert list to tuple."""
+        return tuple(self)
     
     def sort(self) -> 'flist':
         """Return a sorted list."""
@@ -215,6 +276,14 @@ class fgenerator(FBase):
     def to_list(self) -> flist:
         """Convert generator to list."""
         return flist(self)
+    
+    def to_set(self) -> 'fset':
+        """Convert generator to set."""
+        return fset(self)
+    
+    def to_tuple(self) -> tuple:
+        """Convert generator to tuple."""
+        return tuple(self)
     
     def get(self, ind: int, default: Any = None) -> Any:
         """Get item at index or return default."""
@@ -260,7 +329,47 @@ class fdict(dict):
     def merge(self, *dicts: dict, **kwargs) -> 'fdict':
         """Merge dictionaries."""
         return fdict(cytoolz.merge(*((self,)+dicts), **kwargs))
+    
+    def to_pairs(self) -> flist:
+        """Convert dictionary to list of key-value pairs."""
+        return flist(self.items())
+    
+    @classmethod
+    def from_pairs(cls, pairs: Iterable[Tuple[K, V]]) -> 'fdict':
+        """Create dictionary from list of key-value pairs."""
+        return cls(pairs)
 
+class fset(FBase, set):
+    """Functional set class with chainable methods."""
+    
+    def to_list(self) -> flist:
+        """Convert set to list."""
+        return flist(self)
+    
+    def to_generator(self) -> fgenerator:
+        """Convert set to generator."""
+        return fgenerator(self)
+    
+    def to_tuple(self) -> tuple:
+        """Convert set to tuple."""
+        return tuple(self)
+        
+    def union(self, *others: Iterable) -> 'fset':
+        """Return union of sets."""
+        return fset(super().union(*others))
+    
+    def intersection(self, *others: Iterable) -> 'fset':
+        """Return intersection of sets."""
+        return fset(super().intersection(*others))
+    
+    def difference(self, *others: Iterable) -> 'fset':
+        """Return difference of sets."""
+        return fset(super().difference(*others))
+    
+    def symmetric_difference(self, other: Iterable) -> 'fset':
+        """Return symmetric difference of sets."""
+        return fset(super().symmetric_difference(other))
+    
 def frange(*args: int) -> flist:
     """Range as a list."""
     return flist(range(*args))

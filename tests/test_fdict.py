@@ -136,3 +136,17 @@ class TestFDict:
         # From keys with default value
         d = fdict.fromkeys(['a', 'b', 'c'], 0)
         assert dict(d) == {'a': 0, 'b': 0, 'c': 0}
+        
+    def test_to_pairs(self):
+        """Test converting dict to pairs and back"""
+        # To pairs
+        d = fdict({'a': 1, 'b': 2, 'c': 3})
+        pairs = d.to_pairs()
+        assert isinstance(pairs, flist)
+        assert sorted(pairs) == [('a', 1), ('b', 2), ('c', 3)]
+        
+        # From pairs
+        pairs = [('x', 10), ('y', 20), ('z', 30)]
+        d = fdict.from_pairs(pairs)
+        assert isinstance(d, fdict)
+        assert dict(d) == {'x': 10, 'y': 20, 'z': 30}
