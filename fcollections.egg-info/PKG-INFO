@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: fcollections
+Version: 0.1
+Summary: collections with method chaining
+Home-page: https://github.com/PilCAki/fcollections.git
+Download-URL: https://github.com/PilCAki/fcollections/tarball/0.1
+Author: Phillip Adkins
+Author-email: philchiladki@yahoo.com
+Keywords: chaining,functional,cytoolz,itertoolz
+License-File: LICENSE
