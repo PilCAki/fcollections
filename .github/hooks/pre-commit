@@ -1,0 +1,36 @@
+#!/bin/sh
+# Pre-commit hook to run linting checks
+
+# Run flake8
+echo "Running flake8..."
+flake8 fcollections tests
+if [ $? -ne 0 ]; then
+    echo "Linting errors found. Please fix them before committing."
+    exit 1
+fi
+
+# Run isort check
+echo "Checking import sorting with isort..."
+isort --check-only fcollections tests
+if [ $? -ne 0 ]; then
+    echo "Import sorting issues found. Run 'isort fcollections tests' to fix."
+    exit 1
+fi
+
+# If using Python 3.6+, also run black check
+python_version=$(python -c "import sys; print(sys.version_info[0])")
+if [ "$python_version" -ge 3 ]; then
+    python_minor=$(python -c "import sys; print(sys.version_info[1])")
+    if [ "$python_minor" -ge 6 ]; then
+        echo "Checking code formatting with black..."
+        black --check fcollections tests
+        if [ $? -ne 0 ]; then
+            echo "Code formatting issues found. Run 'black fcollections tests' to fix."
+            exit 1
+        fi
+    fi
+fi
+
+# All checks passed
+echo "All linting checks passed!"
+exit 0

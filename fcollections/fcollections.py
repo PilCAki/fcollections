@@ -22,8 +22,9 @@ There's an fdict too.
 
 '''
 
-import cytoolz
 import itertools
+
+import cytoolz
 
 ## --------------------------------------------------------------------------------
 ## BASE CLASS

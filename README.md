@@ -53,6 +53,17 @@ isort fcollections tests
 black fcollections tests
 ```
 
+#### Pre-commit Hook
+
+A pre-commit hook is provided to automatically run these checks before each commit.
+To install it:
+
+```bash
+# From the repository root
+cp .github/hooks/pre-commit .git/hooks/
+chmod +x .git/hooks/pre-commit
+```
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
