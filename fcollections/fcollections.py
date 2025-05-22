@@ -187,8 +187,12 @@ class FBase:
 ## --------------------------------------------------------------------------------
 
 class flist(FBase, list):
-    def __getslice__(self, *args: int) -> 'flist':
-        return flist(super(flist, self).__getslice__(*args))
+    def __getitem__(self, key: Union[int, slice]) -> Union[T, 'flist']:
+        """Get item at index or slice."""
+        result = super(flist, self).__getitem__(key)
+        if isinstance(key, slice):
+            return flist(result)
+        return result
     
     def to_generator(self) -> 'fgenerator':
         """Convert list to generator."""
