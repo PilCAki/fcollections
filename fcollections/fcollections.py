@@ -24,6 +24,7 @@ There's an fdict too.
 
 import cytoolz
 import itertools
+import functools
 
 ## --------------------------------------------------------------------------------
 ## BASE CLASS
@@ -31,9 +32,9 @@ import itertools
 
 class FBase(object):
     def map(self, f):
-        return self.__class__(itertools.imap(f, self))
+        return self.__class__(map(f, self))
     def reduce(self, f, initializer=None):
-        return reduce(f, self, initializer) if initializer else reduce(f, self)
+        return functools.reduce(f, self, initializer) if initializer is not None else functools.reduce(f, self)
     def concat(self):
         return self.__class__(cytoolz.concat(self))
     def diff(self, *seqs, **kwargs):
@@ -41,7 +42,7 @@ class FBase(object):
     def drop(self, n):
         return self.__class__(cytoolz.drop(n, self))
     def filter(self, predicate):
-        return self.__class__(itertools.ifilter(predicate, self))
+        return self.__class__(filter(predicate, self))
     def first(self):
         return cytoolz.first(self)
     def frequencies(self):
@@ -60,7 +61,7 @@ class FBase(object):
     def last(self):
         return cytoolz.last(self)
     def mapcat(self, f):
-        return self.__class__(_.map(f) for _ in self).concat
+        return self.__class__(_.map(f) for _ in self).concat()
     def nth(self, n):
         return cytoolz.nth(n, self)
     def partition(self, n):
@@ -72,7 +73,7 @@ class FBase(object):
         self = self.__class__(seq)
         return first
     def pluck(self, ind):
-        if cytoolz.isiterable(ind): return self.__class__(itertools.imap(flist, cytoolz.pluck(ind, self)))
+        if cytoolz.isiterable(ind): return self.__class__(map(flist, cytoolz.pluck(ind, self)))
         else: return self.__class__(cytoolz.pluck(ind, self))
     def reduce_by(self, key, op):
         return fdict(cytoolz.reduceby(key, op, self)) 
@@ -129,11 +130,11 @@ class fgenerator(FBase):
     
 class fdict(dict):
     def keys(self):
-        return flist(self.viewkeys())
+        return flist(super().keys())
     def values(self):
-        return flist(self.viewvalues())
+        return flist(super().values())
     def items(self):
-        return flist(self.viewitems())
+        return flist(super().items())
     def keymap(self, f):
         return fdict(cytoolz.keymap(f, self))
     def valmap(self, f):
@@ -150,7 +151,7 @@ class fdict(dict):
         return fdict(cytoolz.merge(*((self,)+dicts), **kwargs))
 
 def frange(*args):
-    return flist(xrange(*args))
+    return flist(range(*args))
 def fxrange(*args):
-    return fgenerator(xrange(*args))
+    return fgenerator(range(*args))
 
