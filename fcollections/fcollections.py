@@ -34,6 +34,7 @@ U = TypeVar('U')
 K = TypeVar('K')
 V = TypeVar('V')
 
+
 ## --------------------------------------------------------------------------------
 ## BASE CLASS
 ## --------------------------------------------------------------------------------
@@ -99,6 +100,7 @@ class FBase:
     def last(self) -> T:
         """Return the last element."""
         return cytoolz.last(self)
+
     def mapcat(self, f: Callable[[T], Iterable[S]]) -> 'FBase':
         """Map a function over elements and concatenate results."""
         return self.__class__(self.__class__(_.map(f) for _ in self)).concat()
