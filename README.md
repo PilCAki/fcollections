@@ -1,5 +1,6 @@
 # fcollections
 
+
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![PyPI version](https://img.shields.io/pypi/v/fcollections.svg)](https://pypi.org/project/fcollections/)
 ![Tests](https://github.com/PilCAki/fcollections/workflows/Tests/badge.svg)
@@ -230,6 +231,8 @@ adjusted = data.pipe_map(lambda x: x - 4, lambda x: x + 4, lambda x: x * 2)
 ```
 
 ## License
+
+GNU General Public License v3.0
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
