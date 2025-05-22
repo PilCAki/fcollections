@@ -2,7 +2,7 @@
 Unit tests for fgenerator functionality
 """
 import pytest
-from fcollections import fgenerator, fxrange, flist
+from fcollections import fgenerator, fxrange, flist, fset
 
 class TestFGenerator:
     def test_creation(self):
@@ -92,6 +92,82 @@ class TestFGenerator:
         gen = fxrange(5)
         result = gen.pipe_map(lambda x: x - 4, lambda x: x + 4, lambda x: x * 2)
         assert list(result) == [0, 2, 4, 6, 8]
+    
+    def test_new_methods(self):
+        """Test new chainable methods"""
+        # Find
+        gen = fxrange(10)
+        found = gen.find(lambda x: x > 5)
+        assert found == 6
+        
+        # Not found
+        gen = fxrange(10)
+        not_found = gen.find(lambda x: x > 20)
+        assert not_found is None
+        
+        # Zip with
+        gen1 = fxrange(5)
+        gen2 = fxrange(5, 10)
+        zipped = gen1.zip_with(gen2, lambda x, y: x + y)
+        assert isinstance(zipped, fgenerator)
+        assert list(zipped) == [5, 7, 9, 11, 13]
+        
+        # Chunk (alias for partition)
+        gen = fxrange(5)
+        chunks = gen.chunk(2)
+        assert isinstance(chunks, fgenerator)
+        assert [list(c) for c in chunks] == [[0, 1], [2, 3]]
+        
+        # Flatten
+        gen = fgenerator([[1, 2], [3, 4], [5, 6]])
+        flattened = gen.flatten()
+        assert isinstance(flattened, fgenerator)
+        assert list(flattened) == [1, 2, 3, 4, 5, 6]
+        
+        # Any match / all match
+        gen = fxrange(5)
+        assert gen.any_match(lambda x: x > 3) is True
+        
+        gen = fxrange(5)
+        assert gen.any_match(lambda x: x < 0) is False
+        
+        gen = fxrange(5)
+        assert gen.all_match(lambda x: x >= 0) is True
+        
+        gen = fxrange(5)
+        assert gen.all_match(lambda x: x > 2) is False
+        
+        # Enumerate
+        gen = fxrange(5)
+        enumerated = gen.enumerate(1)
+        assert isinstance(enumerated, fgenerator)
+        assert list(enumerated) == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
+        
+        # Take while / drop while
+        gen = fxrange(10)
+        taken = gen.take_while(lambda x: x < 5)
+        assert isinstance(taken, fgenerator)
+        assert list(taken) == [0, 1, 2, 3, 4]
+        
+        gen = fxrange(10)
+        dropped = gen.drop_while(lambda x: x < 5)
+        assert isinstance(dropped, fgenerator)
+        assert list(dropped) == [5, 6, 7, 8, 9]
+    
+    def test_conversion_methods(self):
+        """Test new conversion methods"""
+        gen = fxrange(5)
+        
+        # To set
+        s = gen.to_set()
+        assert isinstance(s, fset)
+        assert s == {0, 1, 2, 3, 4}
+        
+        # To tuple
+        gen = fxrange(5)
+        t = gen.to_tuple()
+        assert isinstance(t, tuple)
+        assert t == (0, 1, 2, 3, 4)
         
     def test_laziness(self):
         """Test that operations are lazy (not evaluated until needed)"""

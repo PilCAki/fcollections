@@ -15,6 +15,7 @@ fcollections provides collections with functional programming operations and met
 - `flist` - A list that returns `flist` for operations when it makes sense
 - `fgenerator` - A generator that returns `fgenerator` for operations when it makes sense
 - `fdict` - A dictionary with additional functional operations
+- `fset` - A set with chainable methods and functional operations
 
 A Python library that provides enhanced collection classes with method chaining capabilities. fcollections wraps functionality from cytoolz and itertools as methods of collection classes, enabling a fluent functional programming style.
 
@@ -24,7 +25,8 @@ A Python library that provides enhanced collection classes with method chaining 
 - Functional programming paradigm with Python collections
 - Type preservation (methods return the same collection type when possible)
 - Seamless integration with cytoolz and itertools functionality
-- Three main collection types: flist, fgenerator, and fdict
+- Four main collection types: flist, fgenerator, fdict, and fset
+- Easy conversions between collection types
 
 ## Installation
 
@@ -127,6 +129,10 @@ sorted_by_custom = numbers.sort_by(lambda x: -x)  # Sort by custom key
 
 # Convert to generator
 gen = numbers.to_generator()  # Convert to fgenerator
+
+# New conversion methods
+s = numbers.to_set()  # Convert to fset
+t = numbers.to_tuple()  # Convert to tuple
 ```
 
 ### fgenerator
@@ -167,6 +173,36 @@ doubled_values = data.valmap(lambda v: v * 2)  # fdict({'a': 2, 'b': 4, ...})
 
 # Filtering
 evens = data.valfilter(lambda v: v % 2 == 0)  # fdict({'b': 2, 'd': 4})
+
+# New conversion methods
+pairs = data.to_pairs()  # Convert to list of pairs: flist([('a', 1), ('b', 2), ...])
+new_dict = fdict.from_pairs([('x', 10), ('y', 20)])  # Create from pairs
+```
+
+### fset
+
+A set with functional methods and chaining capability.
+
+```python
+from fcollections import fset, frange
+
+# Create sets
+s1 = fset([1, 2, 3, 4, 5])
+s2 = fset([4, 5, 6, 7, 8])
+
+# Set operations
+union = s1.union(s2)  # fset({1, 2, 3, 4, 5, 6, 7, 8})
+intersection = s1.intersection(s2)  # fset({4, 5})
+difference = s1.difference(s2)  # fset({1, 2, 3})
+
+# Functional operations
+doubled = s1.map(lambda x: x * 2)  # fset({2, 4, 6, 8, 10})
+evens = s1.filter(lambda x: x % 2 == 0)  # fset({2, 4})
+
+# Conversion methods
+l = s1.to_list()  # Convert to flist
+g = s1.to_generator()  # Convert to fgenerator
+t = s1.to_tuple()  # Convert to tuple
 ```
 
 ## Advanced Features
@@ -200,6 +236,39 @@ windows = nums.sliding_window(3).to_list()  # flist([flist([0, 1, 2]), flist([1,
 # Other operations
 unique_values = flist([1, 2, 2, 3, 3, 3]).unique()  # flist([1, 2, 3])
 top_values = nums.top_k(3)  # flist([9, 8, 7])
+```
+
+### New Chainable Methods
+
+```python
+from fcollections import frange
+
+nums = frange(10)
+
+# find - Get first element matching a predicate
+found = nums.find(lambda x: x > 5)  # 6
+not_found = nums.find(lambda x: x > 20)  # None
+
+# zip_with - Combine two sequences using a function
+zipped = nums.zip_with(frange(10, 20), lambda a, b: a + b)  # [10, 12, 14, ...]
+
+# chunk - Alias for partition with more intuitive name
+chunks = nums.chunk(2)  # [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+
+# flatten - Flatten one level of nesting
+nested = flist([[1, 2], [3, 4], [5, 6]])
+flattened = nested.flatten()  # [1, 2, 3, 4, 5, 6]
+
+# any_match / all_match - Check if any/all elements satisfy predicate
+has_evens = nums.any_match(lambda x: x % 2 == 0)  # True
+all_positive = nums.all_match(lambda x: x >= 0)  # True
+
+# enumerate - Add index to each element
+with_indices = nums.enumerate(start=1)  # [(1, 0), (2, 1), (3, 2), ...]
+
+# take_while / drop_while - Take/drop elements while predicate is true
+taken = nums.take_while(lambda x: x < 5)  # [0, 1, 2, 3, 4]
+dropped = nums.drop_while(lambda x: x < 5)  # [5, 6, 7, 8, 9]
 ```
 
 ### Complex Method Chaining
