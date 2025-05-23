@@ -11,3 +11,4 @@ fcollections.egg-info/top_level.txt
 tests/test_fdict.py
 tests/test_fgenerator.py
 tests/test_flist.py
+tests/test_fset.py
