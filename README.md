@@ -58,21 +58,79 @@ stats_by_age = (data
 
 ### Side-by-Side Comparison with Standard Python
 
-**Standard Python - Nested function calls:**
+**Complex Data Transformation:**
+
+With standard Python:
 ```python
-# Transforming data with standard Python
+# Complex data processing with standard Python
 data = list(range(100))
-filtered = filter(lambda x: x % 3 == 0, data)
-squared = map(lambda x: x ** 2, filtered)
-result = list(squared)
+filtered = list(filter(lambda x: x % 3 == 0, data))
+squared = list(map(lambda x: x ** 2, filtered))
+chunks = [squared[i:i+5] for i in range(0, len(squared), 5)]
+chunk_sums = [sum(chunk) for chunk in chunks]
+large_sums = list(filter(lambda x: x > 1000, chunk_sums))
+result = sum(large_sums) / len(large_sums) if large_sums else 0
 ```
 
-**With fcollections - Elegant method chaining:**
+With fcollections:
 ```python
-# Transforming data with fcollections
+# The same operation with fcollections
 result = (frange(100)
     .filter(lambda x: x % 3 == 0)
-    .map(lambda x: x ** 2))
+    .map(lambda x: x ** 2)
+    .partition(5)
+    .map(lambda chunk: chunk.reduce(lambda a, b: a + b))
+    .filter(lambda x: x > 1000)
+    .pipe(lambda x: sum(x) / len(x) if x else 0))
+```
+
+**Data Analysis:**
+
+With standard Python:
+```python
+# Grouping and analysis with standard Python
+data = [
+    {"name": "Alice", "age": 25, "score": 95},
+    {"name": "Bob", "age": 20, "score": 85},
+    {"name": "Charlie", "age": 30, "score": 90},
+    {"name": "David", "age": 20, "score": 70},
+    {"name": "Eve", "age": 25, "score": 92}
+]
+
+# Group by age
+age_groups = {}
+for person in data:
+    age = person["age"]
+    if age not in age_groups:
+        age_groups[age] = []
+    age_groups[age].append(person)
+
+# Calculate statistics for each age group
+stats = {}
+for age, people in age_groups.items():
+    scores = [person["score"] for person in people]
+    stats[age] = {
+        "count": len(scores),
+        "avg": sum(scores) / len(scores),
+        "min": min(scores),
+        "max": max(scores)
+    }
+```
+
+With fcollections:
+```python
+# The same operation with fcollections
+stats = (flist(data)
+    .groupby(lambda x: x["age"])
+    .valmap(lambda people: flist(people)
+        .map(lambda p: p["score"])
+        .pipe(lambda scores: {
+            "count": len(scores),
+            "avg": sum(scores) / len(scores),
+            "min": min(scores),
+            "max": max(scores)
+        })
+    ))
 ```
 
 ### Benefits of Method Chaining
@@ -82,6 +140,9 @@ result = (frange(100)
 3. **Type Preservation** - Operations return appropriate collection types automatically
 4. **Expressiveness** - Complex operations expressed clearly without temporary variables
 5. **Composition** - Build sophisticated data pipelines by combining simple operations
+6. **Conciseness** - Eliminate intermediate variables and boilerplate code
+7. **Immutability** - Method chaining promotes immutable data transformations
+8. **Discoverability** - IDE auto-completion makes it easy to discover available operations
 
 ## Overview
 
