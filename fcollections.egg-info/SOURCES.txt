@@ -8,6 +8,8 @@ fcollections.egg-info/SOURCES.txt
 fcollections.egg-info/dependency_links.txt
 fcollections.egg-info/requires.txt
 fcollections.egg-info/top_level.txt
+tests/test_chaincollections.py
 tests/test_fdict.py
 tests/test_fgenerator.py
 tests/test_flist.py
+tests/test_fset.py
