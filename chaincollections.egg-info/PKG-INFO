@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: chaincollections
+Version: 0.1
+Summary: collections with method chaining
+Home-page: https://github.com/PilCAki/chaincollections.git
+Download-URL: https://github.com/PilCAki/chaincollections/tarball/0.1
+Author: Phillip Adkins
+Author-email: philchiladki@yahoo.com
+Keywords: chaining,functional,cytoolz,itertoolz
+Requires-Python: >=3.6
+License-File: LICENSE
