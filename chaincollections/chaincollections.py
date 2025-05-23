@@ -20,9 +20,6 @@ clist() and cgenerator() can be used to convert any normal iterable to either
 
 There's a cdict and cset too.
 
-Note: For backwards compatibility, flist, fgenerator, fdict, fset, frange, and fxrange 
-are still available as aliases.
-
 '''
 
 import cytoolz
@@ -256,156 +253,11 @@ class CBase:
         return self.__class__(_drop_while())
     
 ## --------------------------------------------------------------------------------
-## MAIN CLASSES
-## --------------------------------------------------------------------------------
-
-class flist(CBase, list):
-    def __getitem__(self, key: Union[int, slice]) -> Union[T, 'flist']:
-        """Get item at index or slice."""
-        result = super(flist, self).__getitem__(key)
-        if isinstance(key, slice):
-            return flist(result)
-        return result
-    
-    def to_generator(self) -> 'fgenerator':
-        """Convert list to generator."""
-        return fgenerator(self)
-    
-    def to_set(self) -> 'fset':
-        """Convert list to set."""
-        return fset(self)
-    
-    def to_tuple(self) -> tuple:
-        """Convert list to tuple."""
-        return tuple(self)
-    
-    def sort(self) -> 'flist':
-        """Return a sorted list."""
-        return self.__class__(sorted(self))
-    
-    def sort_by(self, key: Callable[[T], Any]) -> 'flist':
-        """Return a list sorted by key function."""
-        return self.__class__(sorted(self, key=key))
-
-class fgenerator(CBase):
-    def __init__(self, _iterable: Iterable[T]):
-        self._iterable = _iterable
-    
-    def __iter__(self) -> Generator[T, None, None]:
-        return (_ for _ in self._iterable)
-    
-    def to_list(self) -> flist:
-        """Convert generator to list."""
-        return flist(self)
-    
-    def to_set(self) -> 'fset':
-        """Convert generator to set."""
-        return fset(self)
-    
-    def to_tuple(self) -> tuple:
-        """Convert generator to tuple."""
-        return tuple(self)
-    
-    def get(self, ind: int, default: Any = None) -> Any:
-        """Get item at index or return default."""
-        return cytoolz.get(ind, self, default)
-    
-class fdict(dict):
-    def keys(self) -> flist:
-        """Return list of keys."""
-        return flist(super().keys())
-    
-    def values(self) -> flist:
-        """Return list of values."""
-        return flist(super().values())
-    
-    def items(self) -> flist:
-        """Return list of items."""
-        return flist(super().items())
-    
-    def keymap(self, f: Callable[[K], S]) -> 'fdict':
-        """Apply function to keys."""
-        return fdict(cytoolz.keymap(f, self))
-    
-    def valmap(self, f: Callable[[V], S]) -> 'fdict':
-        """Apply function to values."""
-        return fdict(cytoolz.valmap(f, self))
-    
-    def itemmap(self, f: Callable[[Tuple[K, V]], Tuple[S, U]]) -> 'fgenerator':
-        """Apply function to items."""
-        return fgenerator(cytoolz.itemmap(f, self))
-    
-    def keyfilter(self, predicate: Callable[[K], bool]) -> 'fdict':
-        """Filter by key predicate."""
-        return fdict(cytoolz.keyfilter(predicate, self))
-    
-    def valfilter(self, predicate: Callable[[V], bool]) -> 'fdict':
-        """Filter by value predicate."""
-        return fdict(cytoolz.valfilter(predicate, self))
-    
-    def itemfilter(self, predicate: Callable[[Tuple[K, V]], bool]) -> 'fdict':
-        """Filter by item predicate."""
-        return fdict(cytoolz.itemfilter(predicate, self))
-    
-    def merge(self, *dicts: dict, **kwargs) -> 'fdict':
-        """Merge dictionaries."""
-        return fdict(cytoolz.merge(*((self,)+dicts), **kwargs))
-    
-    def to_pairs(self) -> flist:
-        """Convert dictionary to list of key-value pairs."""
-        return flist(self.items())
-    
-    @classmethod
-    def from_pairs(cls, pairs: Iterable[Tuple[K, V]]) -> 'fdict':
-        """Create dictionary from list of key-value pairs."""
-        return cls(pairs)
-
-class fset(CBase, set):
-    """Functional set class with chainable methods."""
-    
-    def to_list(self) -> flist:
-        """Convert set to list."""
-        return flist(self)
-    
-    def to_generator(self) -> fgenerator:
-        """Convert set to generator."""
-        return fgenerator(self)
-    
-    def to_tuple(self) -> tuple:
-        """Convert set to tuple."""
-        return tuple(self)
-        
-    def union(self, *others: Iterable) -> 'fset':
-        """Return union of sets."""
-        return fset(super().union(*others))
-    
-    def intersection(self, *others: Iterable) -> 'fset':
-        """Return intersection of sets."""
-        return fset(super().intersection(*others))
-    
-    def difference(self, *others: Iterable) -> 'fset':
-        """Return difference of sets."""
-        return fset(super().difference(*others))
-    
-    def symmetric_difference(self, other: Iterable) -> 'fset':
-        """Return symmetric difference of sets."""
-        return fset(super().symmetric_difference(other))
-    
-def frange(*args: int) -> flist:
-    """Range as a list."""
-    return flist(range(*args))
-
-def fxrange(*args: int) -> fgenerator:
-    """Range as a generator."""
-    return fgenerator(range(*args))
-
-
-## --------------------------------------------------------------------------------
-## NEW CHAINCOLLECTIONS API CLASSES
+## CLASSES
 ## --------------------------------------------------------------------------------
 
 class clist(CBase, list):
-    """Functional list class with chainable methods - chaincollections API."""
+    """Functional list class with chainable methods."""
     
     def __getitem__(self, key: Union[int, slice]) -> Union[T, 'clist']:
         """Get item at index or slice."""
@@ -441,7 +293,7 @@ class clist(CBase, list):
         return cdict(self)
 
 class cgenerator(CBase):
-    """Functional generator class with chainable methods - chaincollections API."""
+    """Functional generator class with chainable methods."""
     
     def __init__(self, iterable: Iterable[T]):
         """Initialize generator from iterable."""
@@ -472,7 +324,7 @@ class cgenerator(CBase):
         return cdict(self)
 
 class cdict(dict):
-    """Functional dictionary class with chainable methods - chaincollections API."""
+    """Functional dictionary class with chainable methods."""
     
     def keys(self) -> clist:
         """Return keys as clist."""
@@ -515,7 +367,7 @@ class cdict(dict):
         return cdict(cytoolz.merge(*((self,) + dicts), **kwargs))
 
 class cset(CBase, set):
-    """Functional set class with chainable methods - chaincollections API."""
+    """Functional set class with chainable methods."""
     
     def to_list(self) -> clist:
         """Convert set to list."""
@@ -546,17 +398,9 @@ class cset(CBase, set):
         return cset(super().symmetric_difference(other))
 
 def crange(*args: int) -> clist:
-    """Range as a list - chaincollections API."""
+    """Range as a list."""
     return clist(range(*args))
 
 def cxrange(*args: int) -> cgenerator:
-    """Range as a generator - chaincollections API."""
+    """Range as a generator."""
     return cgenerator(range(*args))
-
-
-## --------------------------------------------------------------------------------
-## BACKWARDS COMPATIBILITY ALIASES
-## --------------------------------------------------------------------------------
-
-# Maintain backwards compatibility with old fcollections names
-FBase = CBase  # Alias for backwards compatibility

@@ -1,8 +1,8 @@
 """
-Unit tests for chaincollections API (new naming convention)
+Unit tests for chaincollections
 """
 import pytest
-from fcollections import clist, cdict, cgenerator, crange, cxrange, cset
+from chaincollections import clist, cdict, cgenerator, crange, cxrange, cset
 
 class TestChainCollections:
     def test_clist_basic(self):
@@ -150,27 +150,3 @@ class TestChainCollections:
         
         assert isinstance(result, clist)
         assert list(result) == [0, 4, 8]
-
-class TestBackwardsCompatibility:
-    def test_old_names_still_work(self):
-        """Test that old fcollections names still work"""
-        from fcollections import flist, fdict, fgenerator, frange, fxrange, fset
-        
-        # Test that old classes still work
-        fl = flist([1, 2, 3])
-        assert isinstance(fl, flist)
-        
-        fd = fdict({'a': 1})
-        assert isinstance(fd, fdict)
-        
-        fg = fgenerator([1, 2, 3])
-        assert isinstance(fg, fgenerator)
-        
-        fs = fset([1, 2, 3])
-        assert isinstance(fs, fset)
-        
-        fr = frange(3)
-        assert isinstance(fr, flist)
-        
-        fxr = fxrange(3)
-        assert isinstance(fxr, fgenerator)

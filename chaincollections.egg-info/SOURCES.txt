@@ -1,0 +1,13 @@
+LICENSE
+README.md
+setup.py
+chaincollections/__init__.py
+chaincollections/chaincollections.py
+chaincollections.egg-info/PKG-INFO
+chaincollections.egg-info/SOURCES.txt
+chaincollections.egg-info/dependency_links.txt
+chaincollections.egg-info/requires.txt
+chaincollections.egg-info/top_level.txt
+fcollections/__init__.py
+fcollections/fcollections.py
+tests/test_chaincollections.py
