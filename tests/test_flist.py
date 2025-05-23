@@ -3,7 +3,7 @@ Unit tests for flist functionality
 """
 import pytest
 import numpy as np
-from fcollections import flist, frange, fset
+from chaincollections import flist, frange, fset
 
 class TestFList:
     def test_creation(self):

@@ -2,7 +2,7 @@
 Unit tests for chaincollections API (new naming convention)
 """
 import pytest
-from fcollections import clist, cdict, cgenerator, crange, cxrange, cset
+from chaincollections import clist, cdict, cgenerator, crange, cxrange, cset
 
 class TestChainCollections:
     def test_clist_basic(self):
@@ -154,7 +154,7 @@ class TestChainCollections:
 class TestBackwardsCompatibility:
     def test_old_names_still_work(self):
         """Test that old fcollections names still work"""
-        from fcollections import flist, fdict, fgenerator, frange, fxrange, fset
+        from chaincollections import flist, fdict, fgenerator, frange, fxrange, fset
         
         # Test that old classes still work
         fl = flist([1, 2, 3])

@@ -1,18 +1,18 @@
-# fcollections (chaincollections)
+# chaincollections
 
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![PyPI version](https://img.shields.io/pypi/v/fcollections.svg)](https://pypi.org/project/fcollections/)
-![Tests](https://github.com/PilCAki/fcollections/workflows/Tests/badge.svg)
-[![codecov](https://codecov.io/gh/PilCAki/fcollections/branch/master/graph/badge.svg)](https://codecov.io/gh/PilCAki/fcollections)
+[![PyPI version](https://img.shields.io/pypi/v/chaincollections.svg)](https://pypi.org/project/chaincollections/)
+![Tests](https://github.com/PilCAki/chaincollections/workflows/Tests/badge.svg)
+[![codecov](https://codecov.io/gh/PilCAki/chaincollections/branch/master/graph/badge.svg)](https://codecov.io/gh/PilCAki/chaincollections)
 
 Collections with method chaining for Python.
 
 ## Overview
 
-fcollections provides collections with functional programming operations and method chaining for Python. The package has been updated with a new **chaincollections** API for clearer naming.
+chaincollections provides collections with functional programming operations and method chaining for Python.
 
-### New Chaincollections API (Recommended)
+### Chaincollections API
 
 - `clist` - A list that returns `clist` for operations when it makes sense
 - `cgenerator` - A generator that returns `cgenerator` for operations when it makes sense
@@ -26,7 +26,7 @@ fcollections provides collections with functional programming operations and met
 - `fdict` - A dictionary with additional functional operations
 - `fset` - A set with chainable methods and functional operations
 
-A Python library that provides enhanced collection classes with method chaining capabilities. fcollections wraps functionality from cytoolz and itertools as methods of collection classes, enabling a fluent functional programming style.
+A Python library that provides enhanced collection classes with method chaining capabilities. chaincollections wraps functionality from cytoolz and itertools as methods of collection classes, enabling a fluent functional programming style.
 
 ## Features
 
@@ -41,15 +41,15 @@ A Python library that provides enhanced collection classes with method chaining 
 ## Installation
 
 ```bash
-pip install fcollections
+pip install chaincollections
 ```
 
 ## Usage
 
-### New Chaincollections API (Recommended)
+### Chaincollections API
 
 ```python
-from fcollections import clist, crange, cdict, cgenerator
+from chaincollections import clist, crange, cdict, cgenerator
 
 # Create a list
 a = crange(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -71,7 +71,7 @@ print(result)  # {'a': 10, 'b': 20, 'c': 30}
 ### Legacy API (Backwards Compatible)
 
 ```python
-from fcollections import flist, frange, fdict, fgenerator
+from chaincollections import flist, frange, fdict, fgenerator
 
 # Create a list
 a = frange(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -96,7 +96,7 @@ To run the tests:
 
 ```bash
 pip install pytest pytest-cov
-pytest --cov=fcollections tests/
+pytest --cov=chaincollections tests/
 ```
 
 ## Dependencies
@@ -108,10 +108,10 @@ pytest --cov=fcollections tests/
 
 ### Creating Collections
 
-#### New Chaincollections API
+#### Chaincollections API
 
 ```python
-from fcollections import clist, cgenerator, cdict, crange, cxrange
+from chaincollections import clist, cgenerator, cdict, crange, cxrange
 
 # Creating from existing collections
 my_list = clist([1, 2, 3, 4, 5])
@@ -126,7 +126,7 @@ lazy_nums = cxrange(10)  # cgenerator for [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 #### Legacy API
 
 ```python
-from fcollections import flist, fgenerator, fdict, frange, fxrange
+from chaincollections import flist, fgenerator, fdict, frange, fxrange
 
 # Creating from existing collections
 my_list = flist([1, 2, 3, 4, 5])
@@ -140,10 +140,10 @@ nums_gen = fxrange(10)  # fgenerator containing values 0-9
 
 ### Method Chaining
 
-The power of fcollections is in its method chaining capability:
+The power of chaincollections is in its method chaining capability:
 
 ```python
-from fcollections import frange
+from chaincollections import frange
 
 # Without method chaining
 data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -151,7 +151,7 @@ filtered = filter(lambda x: x % 2 == 0, data)
 mapped = map(lambda x: x * 2, filtered)
 result = list(mapped)  # [0, 4, 8, 12, 16]
 
-# With fcollections' method chaining
+# With chaincollections' method chaining
 result = (frange(10)
           .filter(lambda x: x % 2 == 0)
           .map(lambda x: x * 2))
@@ -165,7 +165,7 @@ result = (frange(10)
 An enhanced list that inherits from Python's list and provides additional functional methods with chaining capability.
 
 ```python
-from fcollections import flist
+from chaincollections import flist
 
 numbers = flist([1, 2, 3, 4, 5])
 
@@ -191,7 +191,7 @@ t = numbers.to_tuple()  # Convert to tuple
 A lazy generator-like object that provides functional methods with chaining capability while maintaining lazy evaluation.
 
 ```python
-from fcollections import fgenerator, fxrange
+from chaincollections import fgenerator, fxrange
 
 # Create a generator from 0 to 999
 gen = fxrange(1000)
@@ -209,7 +209,7 @@ as_list = gen.to_list()  # Converts to flist
 An enhanced dictionary with functional operations that return fdict or appropriate collection types.
 
 ```python
-from fcollections import fdict
+from chaincollections import fdict
 
 data = fdict({'a': 1, 'b': 2, 'c': 3, 'd': 4})
 
@@ -235,7 +235,7 @@ new_dict = fdict.from_pairs([('x', 10), ('y', 20)])  # Create from pairs
 A set with functional methods and chaining capability.
 
 ```python
-from fcollections import fset, frange
+from chaincollections import fset, frange
 
 # Create sets
 s1 = fset([1, 2, 3, 4, 5])
@@ -261,7 +261,7 @@ t = s1.to_tuple()  # Convert to tuple
 ### Partitioning and Grouping
 
 ```python
-from fcollections import frange
+from chaincollections import frange
 
 nums = frange(10)
 
@@ -277,7 +277,7 @@ grouped = nums.groupby(is_even)  # fdict({'even': flist([0, 2, 4, 6, 8]), 'odd':
 ### Sliding Window and Other Operations
 
 ```python
-from fcollections import frange
+from chaincollections import frange
 
 nums = frange(10)
 
@@ -292,7 +292,7 @@ top_values = nums.top_k(3)  # flist([9, 8, 7])
 ### New Chainable Methods
 
 ```python
-from fcollections import frange
+from chaincollections import frange
 
 nums = frange(10)
 
@@ -325,7 +325,7 @@ dropped = nums.drop_while(lambda x: x < 5)  # [5, 6, 7, 8, 9]
 ### Complex Method Chaining
 
 ```python
-from fcollections import frange
+from chaincollections import frange
 
 # Complex processing with method chaining
 result = (frange(100)
@@ -338,7 +338,7 @@ result = (frange(100)
 ### Pipe Operations
 
 ```python
-from fcollections import frange
+from chaincollections import frange
 import numpy as np
 
 data = frange(10)
@@ -350,9 +350,9 @@ std_dev = data.pipe(lambda x: x * 3, np.asarray, np.std)
 adjusted = data.pipe_map(lambda x: x - 4, lambda x: x + 4, lambda x: x * 2)
 ```
 
-## Migration to Chaincollections API
+## Migration from Legacy API
 
-To migrate from the legacy `f*` naming to the new `c*` naming, simply replace:
+To migrate from the legacy `f*` naming to the `c*` naming, simply replace:
 
 - `flist` → `clist`
 - `fgenerator` → `cgenerator`
@@ -371,4 +371,4 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests on the [GitHub repository](https://github.com/PilCAki/fcollections).
+Contributions are welcome! Feel free to open issues or submit pull requests on the [GitHub repository](https://github.com/PilCAki/chaincollections).

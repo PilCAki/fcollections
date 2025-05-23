@@ -2,7 +2,7 @@
 Unit tests for fgenerator functionality
 """
 import pytest
-from fcollections import fgenerator, fxrange, flist, fset
+from chaincollections import fgenerator, fxrange, flist, fset
 
 class TestFGenerator:
     def test_creation(self):

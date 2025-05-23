@@ -2,7 +2,7 @@
 Unit tests for fset functionality
 """
 import pytest
-from fcollections import fset, flist, frange
+from chaincollections import fset, flist, frange
 
 class TestFSet:
     def test_creation(self):

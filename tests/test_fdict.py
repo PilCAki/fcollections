@@ -2,7 +2,7 @@
 Unit tests for fdict functionality
 """
 import pytest
-from fcollections import fdict, flist, frange
+from chaincollections import fdict, flist, frange
 
 class TestFDict:
     def test_creation(self):

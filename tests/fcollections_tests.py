@@ -1,10 +1,10 @@
 '''
 
-fcollections_tests.py
+chaincollections_tests.py
 
 '''
 
-from fcollections import *
+from chaincollections import *
 
 TESTS = []
 def is_test(test):
