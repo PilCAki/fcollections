@@ -1,14 +1,14 @@
 # fcollections
 
-A Python library that provides enhanced collection classes with method chaining capabilities. fcollections wraps functionality from cytoolz and itertools as methods of collection classes, enabling a fluent functional programming style.
+fcollections is a Python library that enhances standard collection classes with method chaining capabilities. By wrapping functionality from cytoolz and itertools as methods of collection classes, fcollections enables a fluent functional programming style in Python.
 
 ## Features
 
-- Method chaining for cleaner, more readable code
-- Enhanced collection types (flist, fgenerator, fdict)
-- Functional programming utilities built into collection objects
-- Integration with cytoolz and itertools
-- Sliding window operations, partitioning, and grouping
+- **Method Chaining**: Write cleaner, more readable code by chaining operations
+- **Enhanced Collections**: Use improved versions of standard collections (flist, fgenerator, fdict)
+- **Functional Utilities**: Access common functional programming patterns directly from collection objects
+- **Seamless Integration**: Works with cytoolz and itertools functionality
+- **Performance**: Maintain lazy evaluation when appropriate for better performance
 
 ## Installation
 
@@ -16,156 +16,149 @@ A Python library that provides enhanced collection classes with method chaining 
 pip install fcollections
 ```
 
-## Dependencies
-
-- Python 2.7 or Python 3.x
-- cytoolz
-
-## Basic Usage
-
-### Creating Collections
+## Quick Start
 
 ```python
-from fcollections import flist, fgenerator, fdict, frange, fxrange
+from fcollections import flist, frange
 
-# Creating from existing collections
-my_list = flist([1, 2, 3, 4, 5])
-my_generator = fgenerator(x for x in range(10))
-my_dict = fdict({'a': 1, 'b': 2, 'c': 3})
+# Create a collection
+numbers = frange(10)
 
-# Using utility functions
-nums = frange(10)  # flist containing [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-nums_gen = fxrange(10)  # fgenerator containing values 0-9
+# Chain methods for clean, readable transformations
+result = (numbers
+    .map(lambda x: x * 3)
+    .filter(lambda x: x % 2 == 0)
+    .take(3)
+    .to_list())
+
+print(result)  # [0, 6, 12]
 ```
 
-### Method Chaining
-
-```python
-from fcollections import frange
-
-# Chain methods together for cleaner code
-result = frange(10).map(lambda x: x * 2).filter(lambda x: x > 5).to_list()
-# Result: [6, 8, 10, 12, 14, 16, 18]
-```
-
-## Core Collection Types
+## Collection Types
 
 ### flist
 
-An enhanced list with method chaining for common operations.
+An enhanced list with functional operations and method chaining:
 
 ```python
 from fcollections import flist
 
 data = flist([1, 2, 3, 4, 5])
-result = data.map(lambda x: x * 2).filter(lambda x: x > 5).to_list()
+result = data.map(lambda x: x * 2).filter(lambda x: x > 5)
+print(result)  # flist([6, 8, 10])
 ```
 
 ### fgenerator
 
-A generator wrapper with method chaining that maintains lazy evaluation.
+A generator wrapper that preserves lazy evaluation while adding functional methods:
 
 ```python
 from fcollections import fgenerator
 
-gen = fgenerator(x for x in range(10))
-result = gen.map(lambda x: x * 2).filter(lambda x: x > 5).take(3).to_list()
-# Result: [6, 8, 10]
+gen = fgenerator(x for x in range(1000))
+# Operations happen lazily - nothing is computed yet
+pipeline = gen.map(lambda x: x * 2).filter(lambda x: x % 10 == 0)
+# Only compute the first 5 values
+print(pipeline.take(5).to_list())  # flist([0, 20, 40, 60, 80])
 ```
 
 ### fdict
 
-An enhanced dictionary with functional operations.
+A dictionary with enhanced functionality:
 
 ```python
 from fcollections import fdict
 
 data = fdict({'a': 1, 'b': 2, 'c': 3, 'd': 4})
-evens = data.valfilter(lambda v: v % 2 == 0)  # fdict({'b': 2, 'd': 4})
+# Filter values
+evens = data.valfilter(lambda v: v % 2 == 0)
+print(evens)  # fdict({'b': 2, 'd': 4})
 ```
 
-## Advanced Features
+## Common Operations
 
-### Partitioning and Grouping
+### Transformation
+
+```python
+from fcollections import flist
+
+# Map transformation
+doubled = flist([1, 2, 3]).map(lambda x: x * 2)  # flist([2, 4, 6])
+
+# Filter elements
+evens = flist(range(10)).filter(lambda x: x % 2 == 0)  # flist([0, 2, 4, 6, 8])
+
+# Reduce to a single value
+total = flist([1, 2, 3, 4]).reduce(lambda a, b: a + b)  # 10
+```
+
+### Grouping and Partitioning
 
 ```python
 from fcollections import frange
-
-nums = frange(10)
-
-# Partitioning
-chunks = nums.partition(3).to_list()  # flist([flist([0, 1, 2]), flist([3, 4, 5]), flist([6, 7, 8])])
-
-# Grouping by a function
-by_parity = nums.groupby(lambda x: 'even' if x % 2 == 0 else 'odd')
-# Result: {'even': [0, 2, 4, 6, 8], 'odd': [1, 3, 5, 7, 9]}
-```
-
-### Sliding Window and Other Operations
-
-```python
-from fcollections import frange
-
-nums = frange(10)
-
-# Sliding window
-windows = nums.sliding_window(3).to_list()  # flist([flist([0, 1, 2]), flist([1, 2, 3]), ...])
-
-# Other operations
-unique_values = flist([1, 2, 2, 3, 3, 3]).unique()  # flist([1, 2, 3])
-top_values = nums.top_k(3)  # flist([9, 8, 7])
-```
-
-### Complex Method Chaining
-
-```python
-from fcollections import frange
-
-# Complex processing with method chaining
-result = (frange(100)
-    .partition(10)  # Split into chunks of 10
-    .map(lambda l: flist(l * 3))  # Repeat each chunk 3 times
-    .reduce(lambda a, b: flist(a + b))  # Combine all chunks
-    .reduce(lambda a, b: a + b))  # Sum all values
-```
-
-### Pipe Operations
-
-```python
-from fcollections import frange
-import numpy as np
 
 data = frange(10)
 
-# Pipe data through a sequence of functions
-std_dev = data.pipe(lambda x: x * 3, np.asarray, np.std)
+# Partition into chunks of specific size
+chunks = data.partition(3).to_list()  # [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 
-# Apply multiple functions to each element
-adjusted = data.pipe_map(lambda x: x - 4, lambda x: x + 4, lambda x: x * 2)
+# Group by a key function
+grouped = data.groupby(lambda x: 'even' if x % 2 == 0 else 'odd')
+# {'even': [0, 2, 4, 6, 8], 'odd': [1, 3, 5, 7, 9]}
+```
+
+### Advanced Operations
+
+```python
+from fcollections import frange
+
+# Sliding window
+windows = frange(5).sliding_window(2).to_list()  # [[0, 1], [1, 2], [2, 3], [3, 4]]
+
+# Top K elements
+top3 = frange(10).top_k(3)  # [9, 8, 7]
+
+# Unique elements
+unique = flist([1, 1, 2, 2, 3]).unique()  # [1, 2, 3]
 ```
 
 ## Feedback and Suggestions
 
-We value your input! If you have ideas for new features, improvements, or encounter any issues, please share them with us:
+We value your input and would love to hear about your experience using fcollections. Your feedback directly influences the development roadmap and helps make the library more useful for everyone.
+
+### Ways to Contribute Feedback
 
 - **Feature Requests**: Open an issue with the label `enhancement` to suggest new functionality
-- **Bug Reports**: Submit issues with the label `bug` to report problems
+- **Bug Reports**: Submit issues with the label `bug` when you encounter problems
 - **General Feedback**: Use the label `feedback` for general thoughts and suggestions
-- **Help Wanted**: Look for issues labeled `help wanted` if you'd like to contribute to specific areas
+- **Help Wanted**: Look for issues labeled `help wanted` if you'd like to contribute
 
-Your feedback directly influences the development roadmap and helps make fcollections more useful for everyone.
+### Submitting Feedback
 
-## License
+1. Visit the [GitHub Issues page](https://github.com/PilCAki/fcollections/issues)
+2. Click "New Issue"
+3. Select the appropriate template or start from scratch
+4. Apply relevant labels
+5. Provide as much detail as possible about your suggestion or the problem you're experiencing
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+Your feedback helps us prioritize development efforts and identify areas that need improvement.
 
 ## Contributing
 
-Contributions are welcome! Here's how you can contribute:
+Contributions to fcollections are welcome! Here's how you can contribute:
 
-1. **Code Contributions**: Fork the repository and submit pull requests for new features or bug fixes
-2. **Documentation**: Help improve or expand the documentation
-3. **Testing**: Add tests or identify testing gaps
-4. **Feedback**: Share your experience using fcollections (see [Feedback and Suggestions](#feedback-and-suggestions))
+1. **Code Contributions**: Fork the repository, make your changes, and submit a pull request
+2. **Documentation**: Help improve this README or add more examples
+3. **Testing**: Add tests to improve coverage or identify edge cases
+4. **Ideas**: Share your thoughts on how fcollections could be improved (see Feedback section)
 
-Feel free to open issues or submit pull requests on the [GitHub repository](https://github.com/PilCAki/fcollections).
+For more details, please see our [Contributing Guidelines](https://github.com/PilCAki/fcollections).
+
+## License
+
+fcollections is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- GitHub: [PilCAki/fcollections](https://github.com/PilCAki/fcollections)
+- Author: Phillip Adkins
