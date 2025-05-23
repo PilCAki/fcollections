@@ -1,4 +1,4 @@
-# fcollections
+# fcollections (chaincollections)
 
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -10,7 +10,16 @@ Collections with method chaining for Python.
 
 ## Overview
 
-fcollections provides collections with functional programming operations and method chaining for Python.
+fcollections provides collections with functional programming operations and method chaining for Python. The package has been updated with a new **chaincollections** API for clearer naming.
+
+### New Chaincollections API (Recommended)
+
+- `clist` - A list that returns `clist` for operations when it makes sense
+- `cgenerator` - A generator that returns `cgenerator` for operations when it makes sense
+- `cdict` - A dictionary with additional functional operations
+- `cset` - A set with chainable methods and functional operations
+
+### Legacy API (Backwards Compatible)
 
 - `flist` - A list that returns `flist` for operations when it makes sense
 - `fgenerator` - A generator that returns `fgenerator` for operations when it makes sense
@@ -25,8 +34,9 @@ A Python library that provides enhanced collection classes with method chaining 
 - Functional programming paradigm with Python collections
 - Type preservation (methods return the same collection type when possible)
 - Seamless integration with cytoolz and itertools functionality
-- Four main collection types: flist, fgenerator, fdict, and fset
+- Four main collection types with both new and legacy naming
 - Easy conversions between collection types
+- Full backwards compatibility with existing code
 
 ## Installation
 
@@ -35,6 +45,30 @@ pip install fcollections
 ```
 
 ## Usage
+
+### New Chaincollections API (Recommended)
+
+```python
+from fcollections import clist, crange, cdict, cgenerator
+
+# Create a list
+a = crange(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Method chaining
+result = (
+    a.filter(lambda x: x % 2 == 0)  # Keep even numbers
+     .map(lambda x: x * 3)           # Multiply by 3
+     .reduce(lambda a, b: a + b)     # Sum them up
+)
+print(result)  # 72
+
+# Working with dictionaries
+d = cdict({'a': 1, 'b': 2, 'c': 3})
+result = d.valmap(lambda x: x * 10)
+print(result)  # {'a': 10, 'b': 20, 'c': 30}
+```
+
+### Legacy API (Backwards Compatible)
 
 ```python
 from fcollections import flist, frange, fdict, fgenerator
@@ -73,6 +107,23 @@ pytest --cov=fcollections tests/
 ## Basic Usage
 
 ### Creating Collections
+
+#### New Chaincollections API
+
+```python
+from fcollections import clist, cgenerator, cdict, crange, cxrange
+
+# Creating from existing collections
+my_list = clist([1, 2, 3, 4, 5])
+my_generator = cgenerator(x for x in range(10))
+my_dict = cdict({'a': 1, 'b': 2, 'c': 3})
+
+# Using utility functions
+nums = crange(10)  # clist containing [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+lazy_nums = cxrange(10)  # cgenerator for [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+#### Legacy API
 
 ```python
 from fcollections import flist, fgenerator, fdict, frange, fxrange
@@ -298,6 +349,19 @@ std_dev = data.pipe(lambda x: x * 3, np.asarray, np.std)
 # Apply multiple functions to each element
 adjusted = data.pipe_map(lambda x: x - 4, lambda x: x + 4, lambda x: x * 2)
 ```
+
+## Migration to Chaincollections API
+
+To migrate from the legacy `f*` naming to the new `c*` naming, simply replace:
+
+- `flist` → `clist`
+- `fgenerator` → `cgenerator`
+- `fdict` → `cdict`
+- `fset` → `cset`
+- `frange` → `crange`
+- `fxrange` → `cxrange`
+
+All functionality remains identical. The old names are still available for backwards compatibility.
 
 ## License
 
