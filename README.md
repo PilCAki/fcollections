@@ -6,7 +6,9 @@
 ![Tests](https://github.com/PilCAki/fcollections/workflows/Tests/badge.svg)
 [![codecov](https://codecov.io/gh/PilCAki/fcollections/branch/master/graph/badge.svg)](https://codecov.io/gh/PilCAki/fcollections)
 
-Collections with method chaining for Python.
+> **Elegant method chaining for Python collections**
+>
+> `data.filter(...).map(...).reduce(...)`
 
 ## Showcase: The Power of Method Chaining
 
