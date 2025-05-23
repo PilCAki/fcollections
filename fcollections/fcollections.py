@@ -73,13 +73,19 @@ class CBase:
         return cytoolz.first(self)
     
     @property
-    def frequencies(self) -> 'fdict':
+    def frequencies(self) -> Dict:
         """Count occurrences of each element."""
-        return fdict(cytoolz.frequencies(self))
+        if isinstance(self, clist) or isinstance(self, cgenerator) or isinstance(self, cset):
+            return cdict(cytoolz.frequencies(self))
+        else:
+            return fdict(cytoolz.frequencies(self))
     
-    def groupby(self, key: Callable[[T], K]) -> 'fdict':
+    def groupby(self, key: Callable[[T], K]) -> Dict:
         """Group elements by a key function."""
-        return fdict(cytoolz.groupby(key, self)).valmap(flist)
+        if isinstance(self, clist) or isinstance(self, cgenerator) or isinstance(self, cset):
+            return cdict(cytoolz.groupby(key, self)).valmap(clist)
+        else:
+            return fdict(cytoolz.groupby(key, self)).valmap(flist)
     
     def interleave(self, seq: Iterable[T], swap: bool = False) -> 'CBase':
         """Interleave elements from two sequences."""
@@ -128,13 +134,19 @@ class CBase:
     def pluck(self, ind: Union[int, Iterable[int]]) -> 'CBase':
         """Extract values at the given indices from each element."""
         if cytoolz.isiterable(ind):
-            return self.__class__(map(flist, cytoolz.pluck(ind, self)))
+            if isinstance(self, clist) or isinstance(self, cgenerator) or isinstance(self, cset):
+                return self.__class__(map(clist, cytoolz.pluck(ind, self)))
+            else:
+                return self.__class__(map(flist, cytoolz.pluck(ind, self)))
         else:
             return self.__class__(cytoolz.pluck(ind, self))
     
-    def reduce_by(self, key: Callable[[T], K], op: Callable[[S, T], S]) -> 'fdict':
+    def reduce_by(self, key: Callable[[T], K], op: Callable[[S, T], S]) -> Dict:
         """Group elements by key and reduce each group with a binary operator."""
-        return fdict(cytoolz.reduceby(key, op, self))
+        if isinstance(self, clist) or isinstance(self, cgenerator) or isinstance(self, cset):
+            return cdict(cytoolz.reduceby(key, op, self))
+        else:
+            return fdict(cytoolz.reduceby(key, op, self))
     
     def remove(self, predicate: Callable[[T], bool]) -> 'CBase':
         """Remove elements that satisfy the predicate."""
@@ -144,10 +156,13 @@ class CBase:
         """Return the second element."""
         return cytoolz.second(self)
     
-    def sliding_window(self, n: int) -> 'fgenerator':
+    def sliding_window(self, n: int) -> Iterable:
         """Create a sliding window of elements."""
         # assuming should always be a generator - otherwise - going to get huge
-        return fgenerator(self.__class__(sw) for sw in cytoolz.sliding_window(n, self))
+        if isinstance(self, clist) or isinstance(self, cgenerator) or isinstance(self, cset):
+            return cgenerator(self.__class__(sw) for sw in cytoolz.sliding_window(n, self))
+        else:
+            return fgenerator(self.__class__(sw) for sw in cytoolz.sliding_window(n, self))
     
     def take(self, n: int) -> 'CBase':
         """Take the first n elements."""
@@ -169,9 +184,12 @@ class CBase:
         """Return only unique elements."""
         return self.__class__(cytoolz.unique(self, key))
     
-    def count_by(self, key: Callable[[T], K] = cytoolz.functoolz.identity) -> 'fdict':
+    def count_by(self, key: Callable[[T], K] = cytoolz.functoolz.identity) -> Dict:
         """Count occurrences of each key."""
-        return fdict(cytoolz.countby(key, self))
+        if isinstance(self, clist) or isinstance(self, cgenerator) or isinstance(self, cset):
+            return cdict(cytoolz.countby(key, self))
+        else:
+            return fdict(cytoolz.countby(key, self))
     
     def partition_by(self, f: Callable[[T], Any]) -> 'CBase':
         """Partition a sequence based on result of a function."""
