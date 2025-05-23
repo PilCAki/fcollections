@@ -417,7 +417,7 @@ class clist(CBase, list):
     def append(self, item: T) -> 'clist':
         """Append an item and return a new clist."""
         new_list = clist(self)
-        new_list.append(item)
+        super(clist, new_list).append(item)
         return new_list
     
     def sort(self, key: Optional[Callable[[T], Any]] = None, reverse: bool = False) -> 'clist':
