@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help improve fcollections
+about: Create a report to help improve chaincollections
 title: '[BUG] '
 labels: bug
 assignees: ''
@@ -29,7 +29,7 @@ Paste error output here
 ## Environment
  - Python version: [e.g. 2.7.10]
  - OS: [e.g. macOS, Windows, Linux]
- - fcollections version: [e.g. 0.1]
+ - chaincollections version: [e.g. 0.1]
 
 ## Additional Context
 Add any other context about the problem here.

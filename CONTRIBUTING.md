@@ -1,6 +1,6 @@
-# Contributing to fcollections
+# Contributing to chaincollections
 
-Thank you for your interest in contributing to fcollections! This document provides guidelines and instructions for contributing to this project.
+Thank you for your interest in contributing to chaincollections! This document provides guidelines and instructions for contributing to this project.
 
 ## Table of Contents
 
@@ -60,7 +60,7 @@ Before submitting an issue, please:
 2. Make your changes
 3. Run the tests to ensure they pass:
    ```
-   python tests/fcollections_tests.py
+   python -m pytest tests/
    ```
 4. Commit your changes with a clear commit message:
    ```
@@ -96,4 +96,4 @@ Before submitting an issue, please:
 
 ---
 
-Thank you for contributing to fcollections! Your efforts help make this project better for everyone.
+Thank you for contributing to chaincollections! Your efforts help make this project better for everyone.
