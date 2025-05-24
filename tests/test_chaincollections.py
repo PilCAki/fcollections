@@ -2,7 +2,7 @@
 Unit tests for chaincollections
 """
 import pytest
-from chaincollections import clist, cdict, cgenerator, crange, cxrange, cset
+from chaincollections import clist, cdict, cgenerator, crange, cxrange, cset, chain
 
 class TestChainCollections:
     def test_clist_basic(self):
@@ -150,3 +150,41 @@ class TestChainCollections:
         
         assert isinstance(result, clist)
         assert list(result) == [0, 4, 8]
+        
+    def test_chain_function(self):
+        """Test the chain function with different collection types"""
+        # Test with list
+        result = chain([1, 2, 3])
+        assert isinstance(result, clist)
+        assert list(result) == [1, 2, 3]
+        
+        # Test with dict
+        result = chain({'a': 1, 'b': 2})
+        assert isinstance(result, cdict)
+        assert dict(result) == {'a': 1, 'b': 2}
+        
+        # Test with set
+        result = chain({1, 2, 3})
+        assert isinstance(result, cset)
+        assert set(result) == {1, 2, 3}
+        
+        # Test with generator
+        gen = (x for x in range(3))
+        result = chain(gen)
+        assert isinstance(result, cgenerator)
+        assert list(result) == [0, 1, 2]
+        
+        # Test with range
+        result = chain(range(3))
+        assert isinstance(result, cgenerator)
+        assert list(result) == [0, 1, 2]
+        
+        # Test with non-collection (scalar)
+        result = chain(42)
+        assert isinstance(result, clist)
+        assert list(result) == [42]
+        
+        # Test with already chain type
+        cl = clist([1, 2, 3])
+        result = chain(cl)
+        assert result is cl  # Should return the same object, not a new one
