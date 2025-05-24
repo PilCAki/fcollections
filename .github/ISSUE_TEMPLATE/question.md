@@ -1,13 +1,13 @@
 ---
 name: Question
-about: Ask a question about fcollections
+about: Ask a question about chaincollections
 title: '[QUESTION] '
 labels: question
 assignees: ''
 ---
 
 ## Question
-A clear and concise question about fcollections usage, implementation, or other aspects.
+A clear and concise question about chaincollections usage, implementation, or other aspects.
 
 ## Context
 Provide some context for your question, such as:
@@ -17,11 +17,11 @@ Provide some context for your question, such as:
 
 ```python
 # Example code if applicable
-from fcollections import *
+from chaincollections import *
 result = flist([1, 2, 3]).some_method()
 ```
 
 ## Environment (if relevant)
  - Python version: [e.g. 2.7.10]
  - OS: [e.g. macOS, Windows, Linux]
- - fcollections version: [e.g. 0.1]
+ - chaincollections version: [e.g. 0.1]

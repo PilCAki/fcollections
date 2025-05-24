@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for fcollections
+about: Suggest an idea for chaincollections
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''
@@ -20,7 +20,7 @@ If applicable, provide examples of how this feature would be used:
 
 ```python
 # Example code showing how the feature would work
-from fcollections import *
+from chaincollections import *
 result = flist([1, 2, 3]).your_new_feature()
 ```
 
