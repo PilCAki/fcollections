@@ -25,7 +25,23 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest pytest-cov cytoolz numpy
+        pip install flake8 black isort
         pip install -e .
+    
+    - name: Lint with flake8
+      run: |
+        # We'll check but not fail the build to allow for gradual improvement
+        flake8 . --count --statistics --exit-zero
+    
+    - name: Check formatting with black
+      run: |
+        # We'll check but not fail the build to allow for gradual improvement
+        black --check --diff . || true
+    
+    - name: Check imports with isort
+      run: |
+        # We'll check but not fail the build to allow for gradual improvement
+        isort --check --diff . || true
     
     - name: Test with pytest
       run: |
