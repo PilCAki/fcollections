@@ -30,99 +30,191 @@ result = (crange(100)
     .take(5))
 ```
 
-### Powerful Data Transformations in One Fluid Chain
+### Navigating and Transforming Complex JSON Trees
 
 ```python
-from chaincollections import crange, cdict, chain
+from chaincollections import chain, cdict
 
-# Process sales data with complex transformations in a single readable chain
-result = (chain([
-        {"product": "Apple", "category": "Fruit", "price": 0.5, "sales": 100},
-        {"product": "Orange", "category": "Fruit", "price": 0.7, "sales": 80},
-        {"product": "Carrot", "category": "Vegetable", "price": 0.3, "sales": 120},
-        {"product": "Cucumber", "category": "Vegetable", "price": 0.6, "sales": 60},
-        {"product": "Banana", "category": "Fruit", "price": 0.4, "sales": 110}
-    ])
-    .groupby(lambda x: x["category"])                   # Group by category
-    .valmap(lambda items: chain(items)                  # For each category:
-        .map(lambda x: {**x, "revenue": x["price"] * x["sales"]})  # Calculate revenue
-        .sort_by(lambda x: x["revenue"], reverse=True)  # Sort by revenue
-        .map(lambda x: f"{x['product']}: ${x['revenue']:.2f}")     # Format output
-        .to_list())                                     # Convert to list
+# Nested JSON from an API response or config file
+api_response = {
+    "metadata": {"version": "1.0", "status": "success"},
+    "results": [
+        {
+            "id": "node1",
+            "type": "folder",
+            "children": [
+                {"id": "node2", "type": "file", "permissions": ["read", "write"], "size": 1024},
+                {"id": "node3", "type": "file", "permissions": ["read"], "size": 2048}
+            ]
+        },
+        {
+            "id": "node4",
+            "type": "folder",
+            "children": [
+                {"id": "node5", "type": "folder", "children": [
+                    {"id": "node6", "type": "file", "permissions": ["read", "write", "execute"], "size": 4096}
+                ]},
+                {"id": "node7", "type": "file", "permissions": ["read"], "size": 512}
+            ]
+        }
+    ]
+}
+
+# Find all executable files at any nesting level, with modified paths
+result = (chain(api_response["results"])
+    .flatmap(lambda node: chain([node])  # Start with top-level node
+        .concat(                         # Then recursively gather:
+            chain(node.get("children", []))
+            .flatmap(lambda child: 
+                chain([child]).concat(  # The child itself
+                    chain(child.get("children", []))  # And its nested children
+                    .flatmap(lambda c: c.get("children", []))  # And their children
+                )
+            )
+        )
+    )
+    .filter(lambda node: node["type"] == "file" and "execute" in node.get("permissions", []))
+    .map(lambda node: {
+        "path": f"/root/{node['id']}",
+        "size_kb": node["size"] / 1024,
+        "full_permissions": "".join(p[0] for p in node.get("permissions", []))
+    })
+    .sort_by(lambda node: node["size_kb"], reverse=True)
+    .to_list()
 )
 
-# Result: {
-#   'Fruit': ['Apple: $50.00', 'Banana: $44.00', 'Orange: $56.00'],
-#   'Vegetable': ['Carrot: $36.00', 'Cucumber: $36.00']
-# }
+# Result: [
+#   {"path": "/root/node6", "size_kb": 4.0, "full_permissions": "rwe"}
+# ]
 ```
 
-### Effortless Dictionary Transformations
+### Graph Traversal and Pathfinding Made Simple
 
 ```python
 from chaincollections import cdict, chain
+from collections import deque
 
-# Create a dictionary of employee data
-employees = cdict({
-    "E001": {"name": "Alice", "dept": "Engineering", "salary": 75000},
-    "E002": {"name": "Bob", "dept": "Marketing", "salary": 65000},
-    "E003": {"name": "Charlie", "dept": "Engineering", "salary": 85000},
-    "E004": {"name": "Diana", "dept": "HR", "salary": 60000},
-    "E005": {"name": "Eve", "dept": "Marketing", "salary": 70000}
+# Represent a graph as an adjacency list dictionary
+graph = cdict({
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E', 'G'],
+    'G': ['F']
 })
 
-# Traditional approach would require multiple steps with temporary variables
-# With chaincollections, transform data in one fluid chain:
-result = (employees
-    .valfilter(lambda emp: emp["salary"] > 65000)  # Filter by salary
-    .valmap(lambda emp: {**emp, "bonus": emp["salary"] * 0.1})  # Add bonus field
-    .groupby(lambda item: item[1]["dept"], lambda item: item[0])  # Group by department
-    .valmap(lambda ids: employees  # For each department:
-        .keyfilter(lambda k: k in ids)  # Keep only relevant employees
-        .values()  # Get employee records
-        .sort_by(lambda emp: emp["salary"], reverse=True)  # Sort by salary descending
-        .to_list()  # Convert to list
-    )
+# Find all paths between two nodes using BFS
+def find_all_paths(start, end, max_depth=10):
+    queue = deque([(start, [start])])
+    all_paths = []
+    
+    while queue and len(all_paths) < 100:  # Limit to prevent infinite loops
+        node, path = queue.popleft()
+        
+        # Get neighboring nodes not already in path
+        for neighbor in graph.get(node, []):
+            if neighbor == end:
+                all_paths.append(path + [neighbor])
+            elif neighbor not in path and len(path) < max_depth:
+                queue.append((neighbor, path + [neighbor]))
+    
+    return chain(all_paths)
+
+# Find and analyze all paths from A to G
+paths = (find_all_paths('A', 'G', max_depth=5)
+    .map(lambda path: "->".join(path))      # Format each path as a string
+    .sort_by(len)                           # Sort by path length
+    .enumerate(start=1)                     # Add index to each path
+    .map(lambda x: f"Path {x[0]}: {x[1]}")  # Format with index
+    .to_list()
 )
 
-# Result: Dictionary of departments with sorted employee records including bonus
+# Result: [
+#   "Path 1: A->C->F->G",
+#   "Path 2: A->B->E->F->G"
+# ]
+
+# Analyze the graph structure
+graph_stats = (chain(graph.items())
+    .map(lambda x: (x[0], len(x[1])))       # Get node and number of connections
+    .sort_by(lambda x: x[1], reverse=True)  # Sort by number of connections
+    .take(3)                                # Take top 3 most connected nodes
+    .map(lambda x: f"Node {x[0]} has {x[1]} connections")
+    .to_list()
+)
+
+# Result: [
+#   "Node F has 3 connections",
+#   "Node B has 3 connections",
+#   "Node A has 2 connections"
+# ]
 ```
 
-### Real-world Data Analysis Made Simple
+### Natural Language Processing Pipeline
 
 ```python
 from chaincollections import chain
-import datetime
+import re
 
-# Analyze log data with complex transformations in a clear, readable flow
-logs = [
-    {"timestamp": "2023-06-01 08:30:22", "level": "INFO", "service": "auth", "message": "User login successful"},
-    {"timestamp": "2023-06-01 08:31:15", "level": "ERROR", "service": "db", "message": "Connection timeout"},
-    {"timestamp": "2023-06-01 08:32:45", "level": "INFO", "service": "api", "message": "Request processed"},
-    {"timestamp": "2023-06-01 08:33:30", "level": "ERROR", "service": "auth", "message": "Invalid credentials"},
-    {"timestamp": "2023-06-01 08:34:10", "level": "WARN", "service": "api", "message": "Slow response time"},
-    {"timestamp": "2023-06-01 08:35:22", "level": "ERROR", "service": "db", "message": "Query failed"}
-]
+# Sample text from a document
+text = """
+Python is a high-level programming language known for its readability.
+Created by Guido van Rossum in 1991, Python emphasizes code readability
+with its notable use of whitespace. Python features a dynamic type system
+and automatic memory management. Python supports multiple programming
+paradigms, including procedural, object-oriented, and functional programming.
+"""
 
-# Parse, filter, group, and format log data in one expressive chain
-result = (chain(logs)
-    .map(lambda log: {
-        **log, 
-        "datetime": datetime.datetime.strptime(log["timestamp"], "%Y-%m-%d %H:%M:%S")
-    })
-    .filter(lambda log: log["level"] in ["ERROR", "WARN"])
-    .groupby(lambda log: log["service"])
-    .valmap(lambda logs: chain(logs)
-        .map(lambda log: f"{log['level']} at {log['datetime'].strftime('%H:%M:%S')}: {log['message']}")
-        .to_list()
-    )
+# Build a comprehensive text analysis pipeline
+result = (chain(text.lower().split("\n"))
+    .filter(bool)                              # Remove empty lines
+    .map(lambda line: re.sub(r'[^\w\s]', '', line))  # Remove punctuation
+    .map(lambda line: line.split())            # Split into words
+    .flatten()                                 # Flatten list of lists into a single list
+    .filter(lambda word: len(word) > 3)        # Filter out short words
+    .frequencies()                             # Count word frequencies
+    .items()                                   # Get (word, count) pairs
+    .filter(lambda x: x[1] > 1)                # Keep words that appear more than once
+    .sort_by(lambda x: x[1], reverse=True)     # Sort by frequency
+    .take(5)                                   # Take top 5 most frequent words
+    .map(lambda x: {"word": x[0], "count": x[1], "length": len(x[0])})
+    .sort_by(lambda x: (x["count"], x["length"]), reverse=True)  # Sort by count, then length
+    .to_list()
 )
 
-# Result: {
-#   'db': ['ERROR at 08:31:15: Connection timeout', 'ERROR at 08:35:22: Query failed'],
-#   'auth': ['ERROR at 08:33:30: Invalid credentials'],
-#   'api': ['WARN at 08:34:10: Slow response time']
-# }
+# Result: [
+#   {"word": "python", "count": 4, "length": 6},
+#   {"word": "programming", "count": 3, "length": 11},
+#   {"word": "readability", "count": 2, "length": 11},
+#   {"word": "code", "count": 2, "length": 4},
+#   {"word": "with", "count": 2, "length": 4}
+# ]
+
+# Identify word co-occurrences in the same line
+co_occurrences = (chain(text.lower().split("\n"))
+    .filter(bool)                              # Remove empty lines
+    .map(lambda line: re.findall(r'\b\w+\b', line))  # Extract words
+    .filter(lambda words: len(words) > 1)      # Only lines with multiple words
+    .flatmap(lambda words: [                   # Generate all word pairs in each line
+        (w1, w2) for i, w1 in enumerate(words) 
+        for w2 in words[i+1:] 
+        if len(w1) > 3 and len(w2) > 3        # Only consider words > 3 chars
+    ])
+    .frequencies()                             # Count pair frequencies
+    .items()                                   # Get (pair, count) tuples
+    .sort_by(lambda x: x[1], reverse=True)     # Sort by frequency
+    .take(3)                                   # Take top 3 pairs
+    .map(lambda x: f"'{x[0][0]}' co-occurs with '{x[0][1]}' {x[1]} times")
+    .to_list()
+)
+
+# Result: [
+#   "'python' co-occurs with 'programming' 3 times",
+#   "'programming' co-occurs with 'language' 2 times",
+#   "'code' co-occurs with 'readability' 2 times"
+# ]
 ```
 
 ### Key Benefits
