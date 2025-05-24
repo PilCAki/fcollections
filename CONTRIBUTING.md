@@ -76,11 +76,27 @@ Before submitting an issue, please:
 
 ### Code Style
 
-- Follow the existing code style in the project
+- Code should be formatted with [Black](https://black.readthedocs.io/)
+- Imports should be sorted with [isort](https://pycqa.github.io/isort/)
+- Code should pass [flake8](https://flake8.pycqa.org/) linting
+- Maximum line length is 100 characters
 - Use 4 spaces for indentation (not tabs)
 - Use meaningful variable and function names
 - Include docstrings for functions and classes
 - Keep functions focused and modular
+
+To format your code before submitting:
+```bash
+# Install formatting tools
+pip install black isort flake8
+
+# Format code
+black .
+isort .
+
+# Check for linting issues
+flake8 .
+```
 
 ### Testing
 
