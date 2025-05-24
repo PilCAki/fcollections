@@ -282,6 +282,30 @@ print(result)  # [2, 4, 6, 8]
 # Automatic dict conversion
 result = chain({'a': 1, 'b': 2}).valmap(lambda x: x * 10)
 print(result)  # {'a': 10, 'b': 20}
+
+# Recursive chaining for nested structures
+nested_data = {
+    'users': [
+        {'name': 'Alice', 'scores': [85, 90, 78]},
+        {'name': 'Bob', 'scores': [92, 88, 76]}
+    ]
+}
+
+# Without recursive=True, you'd need to chain each level manually
+basic = chain(nested_data)
+users = chain(basic['users'])
+user = chain(users[0])
+scores = chain(user['scores'])
+
+# With recursive=True, nested structures are automatically chainable
+recursive = chain(nested_data, recursive=True)
+# Chain methods at any nesting level
+high_scores = recursive['users'].map(
+    lambda user: {'name': user['name'], 
+                 'avg_score': user['scores'].filter(lambda s: s > 80).reduce(lambda a, b: a + b) / 
+                              user['scores'].filter(lambda s: s > 80).count()}
+)
+print(high_scores)  # [{'name': 'Alice', 'avg_score': 87.5}, {'name': 'Bob', 'avg_score': 90.0}]
 ```
 
 ## Migration Guide
@@ -323,6 +347,11 @@ list_data = chain([1, 2, 3, 4, 5])  # clist
 dict_data = chain({'a': 1, 'b': 2})  # cdict
 set_data = chain({1, 2, 3})         # cset
 gen_data = chain(range(5))          # cgenerator
+
+# Enable recursive chaining for nested structures
+nested_data = chain({'a': {'b': [1, 2, 3]}}, recursive=True)
+# Now you can chain methods at any level
+filtered = nested_data['a']['b'].filter(lambda x: x > 1)  # [2, 3]
 ```
 
 This is the recommended way to create chainable collections as it's more concise and handles type detection automatically.
@@ -484,6 +513,42 @@ t = s1.to_tuple()  # Convert to tuple
 ```
 
 ## Advanced Features
+
+### Recursive Chaining
+
+The `chain()` function supports recursive chaining via the `recursive=True` parameter, which automatically wraps nested dictionaries and lists as chainable objects when they are accessed:
+
+```python
+from chaincollections import chain
+
+# Complex nested structure
+data = {
+    "products": [
+        {"id": 1, "name": "Widget", "categories": ["tools", "home"]},
+        {"id": 2, "name": "Gadget", "categories": ["electronics", "tools"]},
+        {"id": 3, "name": "Doohickey", "categories": ["misc"]}
+    ],
+    "metadata": {
+        "tags": ["inventory", "2023"],
+        "version": 2.1
+    }
+}
+
+# Enable recursive chaining
+c = chain(data, recursive=True)
+
+# Chain operations at any nesting level without manual wrapping
+tool_products = c["products"].filter(
+    lambda p: "tools" in p["categories"]
+).map(
+    lambda p: {"name": p["name"], "category_count": len(p["categories"])}
+)
+
+print(tool_products)
+# [{"name": "Widget", "category_count": 2}, {"name": "Gadget", "category_count": 2}]
+```
+
+The recursive behavior is preserved when creating new collections via methods like `filter()`, `map()`, etc., allowing for cleaner code when working with complex nested data structures.
 
 ### Partitioning and Grouping
 
