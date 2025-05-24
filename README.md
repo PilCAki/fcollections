@@ -57,6 +57,37 @@ result = (chain([
 # }
 ```
 
+### Effortless Dictionary Transformations
+
+```python
+from chaincollections import cdict, chain
+
+# Create a dictionary of employee data
+employees = cdict({
+    "E001": {"name": "Alice", "dept": "Engineering", "salary": 75000},
+    "E002": {"name": "Bob", "dept": "Marketing", "salary": 65000},
+    "E003": {"name": "Charlie", "dept": "Engineering", "salary": 85000},
+    "E004": {"name": "Diana", "dept": "HR", "salary": 60000},
+    "E005": {"name": "Eve", "dept": "Marketing", "salary": 70000}
+})
+
+# Traditional approach would require multiple steps with temporary variables
+# With chaincollections, transform data in one fluid chain:
+result = (employees
+    .valfilter(lambda emp: emp["salary"] > 65000)  # Filter by salary
+    .valmap(lambda emp: {**emp, "bonus": emp["salary"] * 0.1})  # Add bonus field
+    .groupby(lambda item: item[1]["dept"], lambda item: item[0])  # Group by department
+    .valmap(lambda ids: employees  # For each department:
+        .keyfilter(lambda k: k in ids)  # Keep only relevant employees
+        .values()  # Get employee records
+        .sort_by(lambda emp: emp["salary"], reverse=True)  # Sort by salary descending
+        .to_list()  # Convert to list
+    )
+)
+
+# Result: Dictionary of departments with sorted employee records including bonus
+```
+
 ### Real-world Data Analysis Made Simple
 
 ```python
