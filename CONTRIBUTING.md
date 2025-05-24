@@ -90,11 +90,12 @@ To format your code before submitting:
 # Install formatting tools
 pip install black isort flake8
 
-# Format code
+# Option 1: Use the formatting script
+./scripts/format_code.sh
+
+# Option 2: Run tools individually
 black .
 isort .
-
-# Check for linting issues
 flake8 .
 ```
 
