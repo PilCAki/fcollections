@@ -41,9 +41,16 @@ V = TypeVar('V')
 ## --------------------------------------------------------------------------------
 
 class CBase:
+    def _preserve_recursive(self, result):
+        """Helper to preserve recursive behavior in results."""
+        if hasattr(self, '_recursive') and self._recursive and isinstance(result, (clist, cdict)):
+            result._recursive = True
+        return result
+    
     def map(self, f: Callable[[T], S]) -> 'CBase':
         """Map a function over the elements."""
-        return self.__class__(map(f, self))
+        result = self.__class__(map(f, self))
+        return self._preserve_recursive(result)
     
     def reduce(self, f: Callable[[T, T], T], initializer: Optional[T] = None) -> T:
         """Reduce the elements using a function."""
@@ -51,19 +58,23 @@ class CBase:
     
     def concat(self) -> 'CBase':
         """Concatenate nested iterables."""
-        return self.__class__(cytoolz.concat(self))
+        result = self.__class__(cytoolz.concat(self))
+        return self._preserve_recursive(result)
     
     def diff(self, *seqs: Iterable, **kwargs) -> 'CBase':
         """Return elements in self that are not in any of the sequences."""
-        return self.__class__(cytoolz.diff(*((self,)+seqs), **kwargs))
+        result = self.__class__(cytoolz.diff(*((self,)+seqs), **kwargs))
+        return self._preserve_recursive(result)
     
     def drop(self, n: int) -> 'CBase':
         """Drop the first n elements."""
-        return self.__class__(cytoolz.drop(n, self))
+        result = self.__class__(cytoolz.drop(n, self))
+        return self._preserve_recursive(result)
     
     def filter(self, predicate: Callable[[T], bool]) -> 'CBase':
         """Filter elements based on a predicate."""
-        return self.__class__(filter(predicate, self))
+        result = self.__class__(filter(predicate, self))
+        return self._preserve_recursive(result)
     
     def first(self) -> T:
         """Return the first element."""
@@ -262,23 +273,45 @@ class clist(CBase, list):
     def __getitem__(self, key: Union[int, slice]) -> Union[T, 'clist']:
         """Get item at index or slice."""
         result = super(clist, self).__getitem__(key)
+        
+        # If this is a recursive collection and the result is a collection, wrap it
+        if hasattr(self, '_recursive') and self._recursive:
+            if isinstance(result, dict):
+                recursive_result = cdict(result)
+                recursive_result._recursive = True
+                return recursive_result
+            elif isinstance(result, list):
+                recursive_result = clist(result)
+                recursive_result._recursive = True
+                return recursive_result
+            
+        # Handle slices by wrapping the result in a clist
         if isinstance(key, slice):
             return clist(result)
+            
         return result
     
     def append(self, item: T) -> 'clist':
         """Append an item and return a new clist."""
         new_list = clist(self)
         super(clist, new_list).append(item)
+        if hasattr(self, '_recursive') and self._recursive:
+            new_list._recursive = True
         return new_list
     
     def sort(self, key: Optional[Callable[[T], Any]] = None, reverse: bool = False) -> 'clist':
         """Sort the list and return a new clist."""
-        return clist(sorted(self, key=key, reverse=reverse))
+        result = clist(sorted(self, key=key, reverse=reverse))
+        if hasattr(self, '_recursive') and self._recursive:
+            result._recursive = True
+        return result
     
     def reverse(self) -> 'clist':
         """Reverse the list and return a new clist."""
-        return clist(reversed(self))
+        result = clist(reversed(self))
+        if hasattr(self, '_recursive') and self._recursive:
+            result._recursive = True
+        return result
     
     def to_generator(self) -> 'cgenerator':
         """Convert list to generator."""
@@ -325,6 +358,23 @@ class cgenerator(CBase):
 
 class cdict(dict):
     """Functional dictionary class with chainable methods."""
+    
+    def __getitem__(self, key: K) -> V:
+        """Get item by key with recursive chaining support."""
+        result = super().__getitem__(key)
+        
+        # If this is a recursive collection and the result is a collection, wrap it
+        if hasattr(self, '_recursive') and self._recursive:
+            if isinstance(result, dict):
+                recursive_result = cdict(result)
+                recursive_result._recursive = True
+                return recursive_result
+            elif isinstance(result, list):
+                recursive_result = clist(result)
+                recursive_result._recursive = True
+                return recursive_result
+        
+        return result
     
     def keys(self) -> clist:
         """Return keys as clist."""
@@ -405,30 +455,58 @@ def cxrange(*args: int) -> cgenerator:
     """Range as a generator."""
     return cgenerator(range(*args))
 
-def chain(obj: Any) -> Union[clist, cdict, cset, cgenerator]:
+def chain(obj: Any, recursive: bool = False) -> Union[clist, cdict, cset, cgenerator]:
     """
     Convert any Python collection to its appropriate chaincollections type.
     
     Args:
         obj: Any Python object
+        recursive: If True, any nested dict/list will be automatically wrapped as 
+                  a chainable object when accessed. Default is False.
         
     Returns:
         The appropriate chaincollections type (clist, cdict, cset, or cgenerator)
     """
     # If it's already a chaincollections type, return it as is
     if isinstance(obj, (clist, cdict, cset, cgenerator)):
+        if recursive and not getattr(obj, '_recursive', False):
+            # If recursive is requested but the object isn't already recursive,
+            # create a new recursive version
+            if isinstance(obj, cdict):
+                result = cdict(obj)
+                result._recursive = True
+                return result
+            elif isinstance(obj, clist):
+                result = clist(obj)
+                result._recursive = True
+                return result
+            elif isinstance(obj, cset):
+                # Sets don't need recursive behavior since their elements are not indexed
+                return obj
+            else:  # cgenerator
+                # Generators don't need recursive behavior since their elements are accessed by iteration
+                return obj
         return obj
     
     # Convert based on type
     if isinstance(obj, dict):
-        return cdict(obj)
+        result = cdict(obj)
+        if recursive:
+            result._recursive = True
+        return result
     elif isinstance(obj, set):
         return cset(obj)
     elif isinstance(obj, list):
-        return clist(obj)
+        result = clist(obj)
+        if recursive:
+            result._recursive = True
+        return result
     elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes)):
         # Handle other iterables as generators
         return cgenerator(obj)
     else:
         # For non-collections, wrap in a singleton list
-        return clist([obj])
+        result = clist([obj])
+        if recursive:
+            result._recursive = True
+        return result

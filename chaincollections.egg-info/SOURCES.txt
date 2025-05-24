@@ -1,5 +1,7 @@
 LICENSE
 README.md
+pyproject.toml
+setup.cfg
 setup.py
 chaincollections/__init__.py
 chaincollections/chaincollections.py

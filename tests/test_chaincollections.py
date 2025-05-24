@@ -188,3 +188,112 @@ class TestChainCollections:
         cl = clist([1, 2, 3])
         result = chain(cl)
         assert result is cl  # Should return the same object, not a new one
+        
+    def test_chain_recursive_basic(self):
+        """Test the chain function with recursive=True for basic nested structures"""
+        # Test with nested dictionary
+        nested_dict = {'a': 1, 'b': {'c': 2, 'd': 3}, 'e': [4, 5, 6]}
+        result = chain(nested_dict, recursive=True)
+        
+        # Verify result is a cdict
+        assert isinstance(result, cdict)
+        
+        # Check that nested dict is automatically converted to cdict when accessed
+        nested = result['b']
+        assert isinstance(nested, cdict)
+        assert nested['c'] == 2
+        assert nested['d'] == 3
+        
+        # Check that nested list is automatically converted to clist when accessed
+        nested_list = result['e']
+        assert isinstance(nested_list, clist)
+        assert list(nested_list) == [4, 5, 6]
+        
+    def test_chain_recursive_list(self):
+        """Test recursive chaining with nested lists"""
+        nested_list = [1, 2, [3, 4, {'a': 5}]]
+        result = chain(nested_list, recursive=True)
+        
+        # Verify result is a clist
+        assert isinstance(result, clist)
+        
+        # Check that nested list is automatically converted to clist when accessed
+        inner_list = result[2]
+        assert isinstance(inner_list, clist)
+        assert list(inner_list) == [3, 4, {'a': 5}]
+        
+        # Check that nested dict in list is automatically converted to cdict when accessed
+        nested_dict = inner_list[2]
+        assert isinstance(nested_dict, cdict)
+        assert nested_dict['a'] == 5
+        
+    def test_chain_recursive_method_chaining(self):
+        """Test method chaining with recursive=True"""
+        nested_data = {
+            'users': [
+                {'name': 'Alice', 'age': 30, 'active': True},
+                {'name': 'Bob', 'age': 25, 'active': False},
+                {'name': 'Charlie', 'age': 35, 'active': True}
+            ]
+        }
+        
+        result = chain(nested_data, recursive=True)
+        
+        # Chain methods on the nested structures
+        active_users = result['users'].filter(lambda user: user['active'])
+        
+        assert isinstance(active_users, clist)
+        assert len(active_users) == 2
+        assert active_users[0]['name'] == 'Alice'
+        assert active_users[1]['name'] == 'Charlie'
+        
+        # Further chain on the filtered results
+        names = active_users.map(lambda user: user['name'])
+        assert isinstance(names, clist)
+        assert list(names) == ['Alice', 'Charlie']
+        
+    def test_chain_recursive_deep_nesting(self):
+        """Test recursive chaining with deeply nested structures"""
+        deep_nested = {
+            'level1': {
+                'level2': {
+                    'level3': [
+                        {'name': 'item1'},
+                        {'name': 'item2'}
+                    ]
+                }
+            }
+        }
+        
+        result = chain(deep_nested, recursive=True)
+        
+        # Access deeply nested structures
+        level3_list = result['level1']['level2']['level3']
+        assert isinstance(level3_list, clist)
+        
+        # Verify we can chain on the deeply nested list
+        names = level3_list.map(lambda item: item['name'])
+        assert isinstance(names, clist)
+        assert list(names) == ['item1', 'item2']
+        
+    def test_chain_recursive_preservation(self):
+        """Test that recursive behavior is preserved through method calls"""
+        nested_data = {
+            'items': [
+                {'id': 1, 'tags': ['a', 'b']},
+                {'id': 2, 'tags': ['b', 'c']},
+                {'id': 3, 'tags': ['a', 'c']}
+            ]
+        }
+        
+        result = chain(nested_data, recursive=True)
+        
+        # Filter and check if recursive behavior is preserved
+        filtered = result['items'].filter(lambda item: 'a' in item['tags'])
+        assert isinstance(filtered, clist)
+        assert len(filtered) == 2
+        
+        # Verify nested structures are still chainable after filtering
+        first_tags = filtered[0]['tags']
+        assert isinstance(first_tags, clist)
+        assert first_tags.filter(lambda tag: tag == 'a')[0] == 'a'
