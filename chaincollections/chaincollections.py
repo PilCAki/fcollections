@@ -404,3 +404,31 @@ def crange(*args: int) -> clist:
 def cxrange(*args: int) -> cgenerator:
     """Range as a generator."""
     return cgenerator(range(*args))
+
+def chain(obj: Any) -> Union[clist, cdict, cset, cgenerator]:
+    """
+    Convert any Python collection to its appropriate chaincollections type.
+    
+    Args:
+        obj: Any Python object
+        
+    Returns:
+        The appropriate chaincollections type (clist, cdict, cset, or cgenerator)
+    """
+    # If it's already a chaincollections type, return it as is
+    if isinstance(obj, (clist, cdict, cset, cgenerator)):
+        return obj
+    
+    # Convert based on type
+    if isinstance(obj, dict):
+        return cdict(obj)
+    elif isinstance(obj, set):
+        return cset(obj)
+    elif isinstance(obj, list):
+        return clist(obj)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes)):
+        # Handle other iterables as generators
+        return cgenerator(obj)
+    else:
+        # For non-collections, wrap in a singleton list
+        return clist([obj])

@@ -40,7 +40,7 @@ pip install fcollections
 ### New Chaincollections API (Recommended)
 
 ```python
-from fcollections import clist, crange, cdict, cgenerator
+from fcollections import clist, crange, cdict, cgenerator, chain
 
 # Create a list
 a = crange(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -57,10 +57,18 @@ print(result)  # 72
 d = cdict({'a': 1, 'b': 2, 'c': 3})
 result = d.valmap(lambda x: x * 10)
 print(result)  # {'a': 10, 'b': 20, 'c': 30}
+
+# Using the chain function for automatic conversion
+result = chain([1, 2, 3, 4]).map(lambda x: x * 2)  # Automatically converts to clist
+print(result)  # [2, 4, 6, 8]
+
+# Automatic dict conversion
+result = chain({'a': 1, 'b': 2}).valmap(lambda x: x * 10)
+print(result)  # {'a': 10, 'b': 20}
 ```
 
 ```python
-from chaincollections import clist, crange, cdict, cgenerator
+from chaincollections import clist, crange, cdict, cgenerator, chain
 
 # Create a list
 a = crange(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -77,6 +85,14 @@ print(result)  # 72
 d = cdict({'a': 1, 'b': 2, 'c': 3})
 result = d.valmap(lambda x: x * 10)
 print(result)  # {'a': 10, 'b': 20, 'c': 30}
+
+# Using the chain function for automatic conversion
+result = chain([1, 2, 3, 4]).map(lambda x: x * 2)  # Automatically converts to clist
+print(result)  # [2, 4, 6, 8]
+
+# Automatic dict conversion
+result = chain({'a': 1, 'b': 2}).valmap(lambda x: x * 10)
+print(result)  # {'a': 10, 'b': 20}
 ```
 
 ## Testing
@@ -100,7 +116,7 @@ pytest --cov=fcollections tests/
 #### New Chaincollections API
 
 ```python
-from fcollections import clist, cgenerator, cdict, crange, cxrange
+from fcollections import clist, cgenerator, cdict, crange, cxrange, chain
 
 # Creating from existing collections
 my_list = clist([1, 2, 3, 4, 5])
@@ -110,10 +126,16 @@ my_dict = cdict({'a': 1, 'b': 2, 'c': 3})
 # Using utility functions
 nums = crange(10)  # clist containing [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 lazy_nums = cxrange(10)  # cgenerator for [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Using the chain function for automatic type detection
+auto_list = chain([1, 2, 3, 4, 5])  # clist
+auto_dict = chain({'a': 1, 'b': 2})  # cdict
+auto_set = chain({1, 2, 3})         # cset
+auto_gen = chain(range(5))          # cgenerator
 ```
 
 ```python
-from chaincollections import clist, cgenerator, cdict, crange, cxrange
+from chaincollections import clist, cgenerator, cdict, crange, cxrange, chain
 
 # Creating from existing collections
 my_list = clist([1, 2, 3, 4, 5])
@@ -123,6 +145,12 @@ my_dict = cdict({'a': 1, 'b': 2, 'c': 3})
 # Using utility functions
 nums = crange(10)  # clist containing [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 nums_gen = cxrange(10)  # cgenerator containing values 0-9
+
+# Using the chain function for automatic type detection
+auto_list = chain([1, 2, 3, 4, 5])  # clist
+auto_dict = chain({'a': 1, 'b': 2})  # cdict
+auto_set = chain({1, 2, 3})         # cset
+auto_gen = chain(range(5))          # cgenerator
 ```
 
 ### Method Chaining
