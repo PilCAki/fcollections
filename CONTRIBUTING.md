@@ -22,7 +22,7 @@ Please be respectful and considerate of others when contributing to this project
 
 ### Prerequisites
 
-- Python 2.7 (the project currently uses Python 2 syntax)
+- Python 3.6+ (as specified in setup.py)
 - Git
 
 ### Setting Up Your Development Environment
@@ -30,8 +30,8 @@ Please be respectful and considerate of others when contributing to this project
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```
-   git clone https://github.com/your-username/fcollections.git
-   cd fcollections
+   git clone https://github.com/your-username/chaincollections.git
+   cd chaincollections
    ```
 3. Install for development:
    ```
